@@ -144,6 +144,8 @@ function drawSheet(
   canvas.height = height;
   const context = canvas.getContext('2d');
   if (!context) return 0;
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
   context.fillStyle = '#fbfaf5';
   context.fillRect(0, 0, width, height);
   context.strokeStyle = '#d9d7cf';
@@ -283,10 +285,20 @@ function Home() {
   };
 
   const exportSheet = (type: 'png' | 'pdf') => {
-    if (!image || !exportCanvasRef.current) return;
-    drawSheet(exportCanvasRef.current, image, photoWidth, photoHeight, spacing, EXPORT_SCALE);
+    if (!image || !image.complete || image.naturalWidth === 0) {
+      setFileError('Please wait for the photo to finish loading, then try the download again.');
+      return;
+    }
+    // Use a fresh offscreen canvas for every export. This avoids browser print
+    // viewers reusing the tiny visually-hidden preview canvas dimensions.
+    const exportCanvas = document.createElement('canvas');
+    const copies = drawSheet(exportCanvas, image, photoWidth, photoHeight, spacing, EXPORT_SCALE);
+    if (copies === 0) {
+      setFileError('This photo size is too large to fit on an A4 sheet.');
+      return;
+    }
     if (type === 'png') {
-      exportCanvasRef.current.toBlob((blob) => {
+      exportCanvas.toBlob((blob) => {
         if (blob) downloadBlob(blob, `a4-photo-sheet-${photoWidth}x${photoHeight}mm.png`);
       }, 'image/png');
       return;
@@ -297,7 +309,7 @@ function Home() {
       return;
     }
     const pdf = new pdfConstructor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    pdf.addImage(exportCanvasRef.current.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH, A4_HEIGHT);
+    pdf.addImage(exportCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH, A4_HEIGHT);
     pdf.save(`a4-photo-sheet-${photoWidth}x${photoHeight}mm.pdf`);
   };
 
