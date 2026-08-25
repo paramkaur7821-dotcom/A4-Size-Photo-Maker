@@ -63,7 +63,7 @@ const FAQS: Faq[] = [
       'Yes. The sheet is laid out using millimetre measurements and exported at 300 DPI. When you print, choose 100% scale or “actual size” and turn off options such as “fit to page”.',
   },
   {
-    question: 'What paper size does A4 Size Photo Maker use?',
+    question: 'What paper size does FitMyPhotoA4 use?',
     answer:
       'Every sheet is exactly A4: 210 × 297 mm, or 8.27 × 11.69 inches. The preview shows the full portrait sheet so you can see the spacing before you download it.',
   },
@@ -215,7 +215,7 @@ function Home() {
   const fitCount = columns * rows;
 
   useEffect(() => {
-    document.title = 'A4 Size Photo Maker — Print more, pay less';
+    document.title = 'FitMyPhotoA4 — Professional A4 Photo Sheet Maker';
     const description = 'Make exact-size passport and ID photo sheets for A4 printing. Local-only, precise, and free.';
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
@@ -307,8 +307,8 @@ function Home() {
         <a className="brand" href="#top" data-testid="link-brand">
           <span className="brand-mark"><span>A4</span></span>
           <span className="brand-copy">
-            <span className="brand-name">A4 Size Photo Maker</span>
-            <span className="brand-tagline">a small print studio</span>
+            <span className="brand-name">FitMyPhotoA4</span>
+            <span className="brand-tagline">professional photo sheets</span>
           </span>
         </a>
         <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
@@ -318,7 +318,7 @@ function Home() {
         <section className="hero" aria-labelledby="page-title">
           <div>
             <div className="eyebrow">Exact sizes · less waste</div>
-            <h1 id="page-title">Make a sheet.<br /><em>Not a compromise.</em></h1>
+            <h1 id="page-title">Professional sheets.<br /><em>Perfectly measured.</em></h1>
             <p className="hero-intro">
               Turn one photo into a precisely measured A4 print sheet for passports, visas, and ID cards. Set the size, leave a sensible cutting gap, and take the file to any affordable printer.
             </p>
