@@ -478,6 +478,21 @@ function Home() {
             </div>
           </div>
 
+          <div className="content-section">
+            <div className="section-head">
+              <h3>From camera to counter</h3>
+              <p>A little preparation makes the final sheet cleaner, sharper, and much easier to approve.</p>
+            </div>
+            <div className="guide-copy">
+              <p><strong>Start with the right source.</strong> FitMyPhotoA4 can arrange almost any clear JPG or PNG, but the quality of the finished sheet still depends on the original photograph. A recent camera photo or a full-resolution phone image gives the best result. Avoid screenshots taken from social media, images forwarded through messaging apps, or pictures that have already been cropped several times. Those copies may look acceptable on a phone but become soft when they are printed and cut down to a small official size.</p>
+              <p><strong>Pay attention to the face and background.</strong> The tool controls the physical rectangle and crops the image proportionally so the face is not stretched. It does not, however, decide whether a photograph meets the rules of a particular passport office, embassy, school, employer, or identity-card authority. Before downloading, check whether the destination expects a white or off-white background, a particular head size, a neutral expression, visible shoulders, uncovered eyes, or a recent photograph. A perfectly measured picture can still be rejected if the background, lighting, clothing, or facial position does not meet the official specification.</p>
+              <p><strong>Use the gap as a cutting guide.</strong> The spacing control changes the distance between neighbouring photos, while the tool keeps a 10 mm edge margin around the sheet. A small gap uses the paper efficiently, but it can make trimming harder if you are cutting with scissors. A larger gap gives you more room for a ruler, guillotine, or paper trimmer. For a home printer, four to six millimetres is a useful starting point. If you take the file to a print shop, ask whether their cutter needs a wider border around the outside of the page.</p>
+              <p><strong>Print without accidental resizing.</strong> The most common reason an otherwise correct photo becomes the wrong size is the print dialog. When you print the downloaded PDF, choose A4 paper, portrait orientation, and 100% scale or Actual size. Disable Fit, Shrink oversized pages, Borderless expansion, and similar automatic options unless your printer documentation specifically requires them. If you use the PNG, open it in an application that lets you set the physical output size or print resolution. Do not paste the image into a document and drag its corners by eye; that can change the millimetre dimensions.</p>
+              <p><strong>Check one copy before printing a full batch.</strong> Place a ruler beside the first printed photo and measure its width and height from edge to edge. This quick check confirms that the printer has not scaled the sheet. It is especially worthwhile for visa applications, passport renewals, exam forms, and government appointments where a rejected photograph can cost more time than a sheet of paper. Once one copy is correct, the remaining photos on the A4 page will have the same dimensions and can be trimmed with confidence.</p>
+              <p><strong>Keep a sensible digital file.</strong> FitMyPhotoA4 processes your image in the browser and does not require an account or an upload. After downloading, keep the original photo and the generated sheet in clearly named folders if you expect to use them again. Requirements change, so use an older sheet only when its size and image date are still accepted by the organisation receiving it. For privacy, avoid leaving personal identity photographs in a shared computer’s Downloads folder after printing, and delete temporary copies from public print-shop machines when you are finished.</p>
+            </div>
+          </div>
+
           <div className="content-section" id="faq">
             <div className="section-head">
               <h3>Questions, answered</h3>
