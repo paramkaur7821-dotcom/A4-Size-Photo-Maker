@@ -323,6 +323,11 @@ function Home() {
             <span className="brand-tagline">professional photo sheets</span>
           </span>
         </a>
+        <nav className="site-nav" aria-label="Primary navigation">
+          <a href="#tool">Maker</a>
+          <a href="#guide">Guide</a>
+          <a href="#faq">FAQ</a>
+        </nav>
         <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
       </header>
 
@@ -345,7 +350,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="workspace" aria-label="Photo sheet maker">
+        <section id="tool" className="workspace" aria-label="Photo sheet maker">
           <div className="panel controls">
             <div className="panel-label"><span>Build your sheet</span><span className="panel-index">01 / 02</span></div>
             <div
@@ -419,7 +424,7 @@ function Home() {
           </div>
         </section>
 
-        <section className="content" aria-label="A4 photo printing guide">
+        <section id="guide" className="content" aria-label="A4 photo printing guide">
           <div className="content-intro">
             <div>
               <div className="section-kicker">The practical bit</div>
@@ -490,6 +495,22 @@ function Home() {
               <p><strong>Print without accidental resizing.</strong> The most common reason an otherwise correct photo becomes the wrong size is the print dialog. When you print the downloaded PDF, choose A4 paper, portrait orientation, and 100% scale or Actual size. Disable Fit, Shrink oversized pages, Borderless expansion, and similar automatic options unless your printer documentation specifically requires them. If you use the PNG, open it in an application that lets you set the physical output size or print resolution. Do not paste the image into a document and drag its corners by eye; that can change the millimetre dimensions.</p>
               <p><strong>Check one copy before printing a full batch.</strong> Place a ruler beside the first printed photo and measure its width and height from edge to edge. This quick check confirms that the printer has not scaled the sheet. It is especially worthwhile for visa applications, passport renewals, exam forms, and government appointments where a rejected photograph can cost more time than a sheet of paper. Once one copy is correct, the remaining photos on the A4 page will have the same dimensions and can be trimmed with confidence.</p>
               <p><strong>Keep a sensible digital file.</strong> FitMyPhotoA4 processes your image in the browser and does not require an account or an upload. After downloading, keep the original photo and the generated sheet in clearly named folders if you expect to use them again. Requirements change, so use an older sheet only when its size and image date are still accepted by the organisation receiving it. For privacy, avoid leaving personal identity photographs in a shared computer’s Downloads folder after printing, and delete temporary copies from public print-shop machines when you are finished.</p>
+            </div>
+          </div>
+
+          <div className="content-section">
+            <div className="section-head">
+              <h3>Print quality, explained simply</h3>
+              <p>Good results come from combining accurate dimensions with a sharp, well-prepared original image.</p>
+            </div>
+            <div className="guide-copy">
+              <p><strong>What 300 DPI means.</strong> DPI, or dots per inch, describes how much image detail is available for printing. A small identity photograph still needs enough pixels to show clean edges, natural skin tones, and fine details such as hair and glasses. FitMyPhotoA4 prepares its export canvas around the A4 dimensions at 300 DPI, which is a common professional print setting. This does not magically add detail to a low-quality source, but it gives a good original the right space to reproduce clearly on paper.</p>
+              <p><strong>Why the PDF is useful.</strong> A PDF is often the easiest format for a print shop because it preserves the A4 page size and keeps the sheet together as one document. It is also less likely than a casually opened image to be resized by an application that is trying to fit content inside a window. The PNG download is useful when you want to inspect the sheet, place it into a document, or use an image-focused printer workflow. Whichever format you choose, the final print dialog is still important: a file can be perfectly measured and then be printed incorrectly if automatic scaling is applied.</p>
+              <p><strong>Colour and paper choices.</strong> Use the colour settings recommended by your printer and avoid applying artistic filters after the sheet has been generated. A neutral, evenly lit photo usually looks more natural on matte or satin paper than on highly glossy paper. Glossy paper can produce reflections that make a small face difficult to inspect, while very thin office paper may show ink bleed or curl. If an office or embassy specifies a paper type, follow that instruction first. For a normal application photo, a clean bright sheet with good contrast is usually preferable to an over-saturated or heavily sharpened print.</p>
+              <p><strong>Lighting matters more than editing.</strong> If you are taking a new source photo, face a large window or use soft light from in front of the subject. Avoid strong light from above, which can create shadows under the eyes, nose, and chin. Stand several steps away from the camera instead of using an extreme wide-angle selfie view. Keep the camera level with the face, leave enough space around the head, and ask the subject to look directly at the lens. A simple, well-lit original needs less correction and will look more professional after it is arranged on the A4 sheet.</p>
+              <p><strong>Use the size table as a starting point, not a legal guarantee.</strong> Passport and visa authorities can change their requirements, and different document types in the same country may use different dimensions. Some organisations ask for a digital upload with pixel dimensions rather than a physical print. Others require a photographer’s stamp, a specific paper finish, or a particular number of copies. Always compare the destination’s current instructions with the selected preset. When there is a difference, choose Custom size and enter the official measurement in millimetres instead of relying on a similar-looking preset.</p>
+              <p><strong>Troubleshooting a sheet that looks wrong.</strong> If the preview contains empty outlines, choose a photo first; those outlines are only a planning view. If the photo looks cropped, remember that the tool fills the selected rectangle without stretching it, so a portrait rectangle may trim the sides of a landscape original. Choose a source with a similar orientation or retake the photo with more space around the subject. If a downloaded image looks dark, check the original file in a normal image viewer and compare it with the preview. A very dark source, a display colour profile, or a paint application preview at a tiny zoom can make a correct image look different on screen.</p>
+              <p><strong>Plan for the whole appointment.</strong> A photo sheet is one part of a document application. Before you leave for an appointment, check the form, payment method, identity documents, copies, photographs, and any appointment confirmation. Keep a few spare prints in a flat envelope so they do not bend or collect fingerprints. If you are preparing photos for a family, create one sheet per person or label separate downloads clearly. This keeps different document sizes from being mixed together and makes the cutting stage faster.</p>
             </div>
           </div>
 
