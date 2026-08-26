@@ -215,6 +215,21 @@ input[type="range"] { display: block; width: 100%; accent-color: hsl(var(--prima
 .metric strong { display: block; font: 400 28px var(--app-font-serif); color: hsl(var(--foreground)); }
 .metric span { display: block; color: hsl(var(--muted-foreground)); font: 10px var(--app-font-mono); line-height: 1.4; }
 .content-section { padding: 58px 0; border-bottom: 1px solid hsl(var(--border)); }
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.22, 1, .36, 1); }
+.reveal.revealed { opacity: 1; transform: translateY(0); }
+.reveal .section-head, .reveal .money-layout, .reveal .mistakes-grid, .reveal .faq-list, .reveal .size-table, .reveal .guide-copy { animation: content-settle .8s .08s both; }
+.reveal .guide-copy p { opacity: 0; transform: translateY(10px); animation: copy-rise .55s ease forwards; }
+.reveal .guide-copy p:nth-child(2) { animation-delay: .08s; }
+.reveal .guide-copy p:nth-child(3) { animation-delay: .16s; }
+.reveal .guide-copy p:nth-child(4) { animation-delay: .24s; }
+.reveal .guide-copy p:nth-child(5) { animation-delay: .32s; }
+.reveal .guide-copy p:nth-child(6) { animation-delay: .4s; }
+.reveal .guide-copy p:nth-child(7) { animation-delay: .48s; }
+@keyframes content-settle { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes copy-rise { to { opacity: 1; transform: translateY(0); } }
+.faq-item, .mistake, .step, .metric { transition: transform .25s ease, border-color .25s ease, background .25s ease; }
+.faq-item:hover, .mistake:hover, .step:hover { transform: translateX(5px); }
+.metric:hover { transform: translateY(-3px); }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 30px; margin-bottom: 27px; }
 .section-head h3 { margin: 0; font: 400 35px var(--app-font-serif); letter-spacing: -.03em; }
 .section-head p { margin: 0; max-width: 400px; font-size: 12px; line-height: 1.6; text-align: right; }
@@ -280,4 +295,9 @@ input[type="range"] { display: block; width: 100%; accent-color: hsl(var(--prima
   .faq-list { column-gap: 0; }
   .footer { display: block; line-height: 1.7; }
   .footer span { display: block; margin-top: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .reveal { opacity: 1; transform: none; }
 }

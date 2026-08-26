@@ -247,6 +247,27 @@ function Home() {
     drawSheet(previewCanvasRef.current, image, photoWidth, photoHeight, spacing, 4);
   }, [image, photoWidth, photoHeight, spacing]);
 
+  useEffect(() => {
+    const revealItems = document.querySelectorAll<HTMLElement>('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      revealItems.forEach((item) => item.classList.add('revealed'));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px' },
+    );
+    revealItems.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => () => {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
   }, [objectUrl]);
@@ -439,7 +460,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section">
+          <div className="content-section reveal">
             <div className="section-head">
               <h3>Common official sizes</h3>
               <p>Requirements vary by authority. Check your application before you print; this table is a useful starting point.</p>
@@ -460,7 +481,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section">
+          <div className="content-section reveal">
             <div className="money-layout">
               <div className="money-note"><strong>The small maths<br />behind the saving.</strong><p>At a print shop, five identical ID photos can cost more than a full colour A4 page. Arrange them yourself, pay for one sheet, and keep the file for the next application.</p></div>
               <div className="steps">
@@ -471,7 +492,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section">
+          <div className="content-section reveal">
             <div className="section-head">
               <h3>Small mistakes, expensive reprints</h3>
               <p>A quick check before you press print can save a trip, a fee, and an awkward passport appointment.</p>
@@ -483,7 +504,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section">
+          <div className="content-section reveal">
             <div className="section-head">
               <h3>From camera to counter</h3>
               <p>A little preparation makes the final sheet cleaner, sharper, and much easier to approve.</p>
@@ -498,7 +519,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section">
+          <div className="content-section reveal">
             <div className="section-head">
               <h3>Print quality, explained simply</h3>
               <p>Good results come from combining accurate dimensions with a sharp, well-prepared original image.</p>
@@ -514,7 +535,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section" id="faq">
+          <div className="content-section reveal" id="faq">
             <div className="section-head">
               <h3>Questions, answered</h3>
               <p>Ten useful answers for the moment between downloading your sheet and putting it in the printer.</p>
