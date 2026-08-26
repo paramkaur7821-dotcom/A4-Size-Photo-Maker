@@ -182,6 +182,17 @@ h1 em { color: hsl(var(--primary)); }
 .number-input:focus { border-color: hsl(var(--primary)); box-shadow: 0 0 0 2px hsl(var(--ring) / .16); }
 input[type="range"] { display: block; width: 100%; accent-color: hsl(var(--primary)); }
 .range-scale { display: flex; justify-content: space-between; color: hsl(var(--muted-foreground)); font: 9px var(--app-font-mono); margin-top: 7px; }
+.quality-settings { display: grid; gap: 8px; margin-top: 24px; padding-top: 19px; border-top: 1px solid hsl(var(--border)); }
+.setting-toggle { min-height: 48px; display: flex; align-items: center; gap: 11px; cursor: pointer; }
+.setting-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle-switch { width: 34px; height: 20px; flex: 0 0 auto; position: relative; border-radius: 999px; background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); transition: background .2s ease, border-color .2s ease; }
+.toggle-switch::after { content: ''; position: absolute; width: 14px; height: 14px; left: 2px; top: 2px; border-radius: 50%; background: hsl(var(--muted-foreground)); transition: transform .2s ease, background .2s ease; }
+.setting-toggle input:checked + .toggle-switch { background: hsl(var(--primary)); border-color: hsl(var(--primary)); }
+.setting-toggle input:checked + .toggle-switch::after { background: hsl(var(--primary-foreground)); transform: translateX(14px); }
+.setting-toggle input:focus-visible + .toggle-switch { outline: 2px solid hsl(var(--ring)); outline-offset: 3px; }
+.toggle-copy { display: grid; gap: 3px; }
+.toggle-copy strong { font-size: 11px; }
+.toggle-copy small { color: hsl(var(--muted-foreground)); font: 10px var(--app-font-mono); }
 .tip { display: flex; gap: 9px; padding: 12px; margin-top: 23px; background: hsl(39 45% 92%); color: hsl(var(--secondary-foreground)); font-size: 10px; line-height: 1.5; }
 .tip svg { flex: 0 0 auto; color: hsl(var(--accent)); }
 .control-actions { border-top: 1px solid hsl(var(--border)); margin: 23px -24px -24px; padding: 17px 24px; display: flex; justify-content: space-between; gap: 8px; }

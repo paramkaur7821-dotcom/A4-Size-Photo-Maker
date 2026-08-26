@@ -43,7 +43,8 @@ declare global {
 const A4_WIDTH = 210;
 const A4_HEIGHT = 297;
 const DEFAULT_MARGIN = 10;
-const EXPORT_SCALE = 300 / 25.4;
+const STANDARD_DPI = 300;
+const HD_DPI = 600;
 
 const PRESETS: Preset[] = [
   { key: 'stamp', label: 'Stamp size', detail: '20 × 25 mm', width: 20, height: 25 },
@@ -116,6 +117,7 @@ function drawPhoto(
   y: number,
   width: number,
   height: number,
+  blackAndWhite: boolean,
 ) {
   const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
   const sourceWidth = width / scale;
@@ -126,6 +128,7 @@ function drawPhoto(
   context.beginPath();
   context.rect(x, y, width, height);
   context.clip();
+  context.filter = blackAndWhite ? 'grayscale(1)' : 'none';
   context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
   context.restore();
 }
@@ -137,6 +140,7 @@ function drawSheet(
   heightMm: number,
   spacingMm: number,
   scale = 4,
+  blackAndWhite = false,
 ) {
   const width = Math.round(A4_WIDTH * scale);
   const height = Math.round(A4_HEIGHT * scale);
@@ -156,8 +160,6 @@ function drawSheet(
   const rows = Math.max(0, Math.floor((A4_HEIGHT - DEFAULT_MARGIN * 2 + spacingMm) / (heightMm + spacingMm)));
   const photoWidth = widthMm * scale;
   const photoHeight = heightMm * scale;
-  const gap = spacingMm * scale;
-
   context.setLineDash([scale * 1.5, scale * 1.5]);
   context.lineWidth = Math.max(1, scale / 3);
   for (let row = 0; row < rows; row += 1) {
@@ -166,7 +168,7 @@ function drawSheet(
       const y = (DEFAULT_MARGIN + row * (heightMm + spacingMm)) * scale;
       if (image) {
         context.setLineDash([]);
-        drawPhoto(context, image, x, y, photoWidth, photoHeight);
+        drawPhoto(context, image, x, y, photoWidth, photoHeight, blackAndWhite);
         context.setLineDash([scale * 1.5, scale * 1.5]);
         context.strokeStyle = 'rgba(31, 53, 61, .28)';
         context.strokeRect(x, y, photoWidth, photoHeight);
@@ -203,6 +205,8 @@ function Home() {
   const [customWidth, setCustomWidth] = useState(35);
   const [customHeight, setCustomHeight] = useState(45);
   const [spacing, setSpacing] = useState(4);
+  const [blackAndWhite, setBlackAndWhite] = useState(false);
+  const [hdQuality, setHdQuality] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -244,8 +248,8 @@ function Home() {
 
   useEffect(() => {
     if (!previewCanvasRef.current) return;
-    drawSheet(previewCanvasRef.current, image, photoWidth, photoHeight, spacing, 4);
-  }, [image, photoWidth, photoHeight, spacing]);
+    drawSheet(previewCanvasRef.current, image, photoWidth, photoHeight, spacing, 4, blackAndWhite);
+  }, [image, photoWidth, photoHeight, spacing, blackAndWhite]);
 
   useEffect(() => {
     const revealItems = document.querySelectorAll<HTMLElement>('.reveal');
@@ -303,6 +307,8 @@ function Home() {
     setCustomWidth(35);
     setCustomHeight(45);
     setSpacing(4);
+    setBlackAndWhite(false);
+    setHdQuality(false);
   };
 
   const exportSheet = (type: 'png' | 'pdf') => {
@@ -313,7 +319,8 @@ function Home() {
     // Use a fresh offscreen canvas for every export. This avoids browser print
     // viewers reusing the tiny visually-hidden preview canvas dimensions.
     const exportCanvas = document.createElement('canvas');
-    const copies = drawSheet(exportCanvas, image, photoWidth, photoHeight, spacing, EXPORT_SCALE);
+    const exportScale = (hdQuality ? HD_DPI : STANDARD_DPI) / 25.4;
+    const copies = drawSheet(exportCanvas, image, photoWidth, photoHeight, spacing, exportScale, blackAndWhite);
     if (copies === 0) {
       setFileError('This photo size is too large to fit on an A4 sheet.');
       return;
@@ -418,10 +425,22 @@ function Home() {
               <input id="spacing" type="range" min="2" max="16" step="1" value={spacing} onChange={(event) => setSpacing(Number(event.target.value))} data-testid="input-spacing" />
               <div className="range-scale"><span>2 mm · compact</span><span>16 mm · easy cuts</span></div>
             </div>
+              <div className="quality-settings" aria-label="Photo output settings">
+                <label className="setting-toggle">
+                  <input type="checkbox" checked={blackAndWhite} onChange={(event) => setBlackAndWhite(event.target.checked)} data-testid="checkbox-black-and-white" />
+                  <span className="toggle-switch" aria-hidden="true" />
+                  <span className="toggle-copy"><strong>Black &amp; White</strong><small>{blackAndWhite ? 'Grayscale enabled' : 'Keep original color'}</small></span>
+                </label>
+                <label className="setting-toggle">
+                  <input type="checkbox" checked={hdQuality} onChange={(event) => setHdQuality(event.target.checked)} data-testid="checkbox-hd-quality" />
+                  <span className="toggle-switch" aria-hidden="true" />
+                  <span className="toggle-copy"><strong>HD Quality</strong><small>{hdQuality ? 'HD (600 DPI)' : 'Standard (300 DPI)'}</small></span>
+                </label>
+              </div>
             <div className="tip"><Info size={15} /><span>A 10 mm edge margin is reserved on every side. It keeps your sheet inside the printable area of most home and shop printers.</span></div>
             <div className="control-actions">
               <button className="button button-line" type="button" onClick={reset} data-testid="button-reset"><RefreshCcw size={13} /> Reset</button>
-              <span className="header-note"><Ruler size={13} /> 300 DPI export</span>
+                <span className="header-note"><Ruler size={13} /> {hdQuality ? '600 DPI HD export' : '300 DPI export'}</span>
             </div>
           </div>
 
