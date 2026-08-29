@@ -352,7 +352,7 @@ function Home() {
               <circle className="brand-logo-dot" cx="32.5" cy="12.5" r="1.5" />
             </svg>
             <span className="brand-copy">
-              <span className="brand-name">A4 Photo Maker</span>
+              <span className="brand-name">FitMyPhotoA4</span>
               <span className="brand-tagline">professional photo sheets</span>
             </span>
           </a>

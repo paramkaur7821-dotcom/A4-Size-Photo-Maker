@@ -1,4 +1,4 @@
-# A4 Size Photo Maker
+# FitMyPhotoA4
 
 Browser tool that arranges uploaded photos on a print-ready A4 sheet with preset or custom dimensions.
 
