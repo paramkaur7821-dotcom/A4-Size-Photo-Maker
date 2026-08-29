@@ -195,7 +195,6 @@ function downloadBlob(blob: Blob, filename: string) {
 
 function Home() {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const exportCanvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [fileName, setFileName] = useState('');
@@ -344,19 +343,26 @@ function Home() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <a className="brand" href="#top" data-testid="link-brand">
-          <span className="brand-mark"><span>A4</span></span>
-          <span className="brand-copy">
-            <span className="brand-name">FitMyPhotoA4</span>
-            <span className="brand-tagline">professional photo sheets</span>
-          </span>
-        </a>
-        <nav className="site-nav" aria-label="Primary navigation">
-          <a href="#tool">Maker</a>
-          <a href="#guide">Guide</a>
-          <a href="#faq">FAQ</a>
-        </nav>
-        <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
+        <div className="site-header-inner">
+          <a className="brand" href="#top" data-testid="link-brand">
+            <svg className="brand-logo" viewBox="0 0 40 34" aria-hidden="true">
+              <rect x="1.5" y="7.5" width="37" height="25" rx="2" />
+              <path d="M12 7.5 14.8 2h10.4L28 7.5" />
+              <circle cx="20" cy="20" r="7" />
+              <circle className="brand-logo-dot" cx="32.5" cy="12.5" r="1.5" />
+            </svg>
+            <span className="brand-copy">
+              <span className="brand-name">A4 Photo Maker</span>
+              <span className="brand-tagline">professional photo sheets</span>
+            </span>
+          </a>
+          <nav className="site-nav" aria-label="Primary navigation">
+            <a href="#tool">Maker</a>
+            <a href="#guide">Guide</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+          <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
+        </div>
       </header>
 
       <main id="top" className="main-wrap">
@@ -479,7 +485,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="content-section reveal">
+          <div className="content-section reveal size-section">
             <div className="section-head">
               <h3>Common official sizes</h3>
               <p>Requirements vary by authority. Check your application before you print; this table is a useful starting point.</p>
@@ -504,9 +510,9 @@ function Home() {
             <div className="money-layout">
               <div className="money-note"><strong>The small maths<br />behind the saving.</strong><p>At a print shop, five identical ID photos can cost more than a full colour A4 page. Arrange them yourself, pay for one sheet, and keep the file for the next application.</p></div>
               <div className="steps">
-                <div className="step"><span className="step-num">01</span><div><strong>Choose a clear original</strong><p>Upload the largest, sharpest photo you have. The tool crops the edges to fit without stretching your face.</p></div></div>
-                <div className="step"><span className="step-num">02</span><div><strong>Set the authority’s size</strong><p>Pick a preset or enter the exact width and height in millimetres. The count updates as you work.</p></div></div>
-                <div className="step"><span className="step-num">03</span><div><strong>Print at actual size</strong><p>Download PNG or PDF, then select 100% / actual size in your print dialog. Never choose “fit to page”.</p></div></div>
+                <article className="step"><span className="step-num">01</span><div><strong>Choose a clear original</strong><p>Upload the largest, sharpest photo you have. The tool crops the edges to fit without stretching your face.</p></div></article>
+                <article className="step"><span className="step-num">02</span><div><strong>Set the authority’s size</strong><p>Pick a preset or enter the exact width and height in millimetres. The count updates as you work.</p></div></article>
+                <article className="step"><span className="step-num">03</span><div><strong>Print at actual size</strong><p>Download PNG or PDF, then select 100% / actual size in your print dialog. Never choose “fit to page”.</p></div></article>
               </div>
             </div>
           </div>
@@ -528,13 +534,13 @@ function Home() {
               <h3>From camera to counter</h3>
               <p>A little preparation makes the final sheet cleaner, sharper, and much easier to approve.</p>
             </div>
-            <div className="guide-copy">
-              <p><strong>Start with the right source.</strong> FitMyPhotoA4 can arrange almost any clear JPG or PNG, but the quality of the finished sheet still depends on the original photograph. A recent camera photo or a full-resolution phone image gives the best result. Avoid screenshots taken from social media, images forwarded through messaging apps, or pictures that have already been cropped several times. Those copies may look acceptable on a phone but become soft when they are printed and cut down to a small official size.</p>
-              <p><strong>Pay attention to the face and background.</strong> The tool controls the physical rectangle and crops the image proportionally so the face is not stretched. It does not, however, decide whether a photograph meets the rules of a particular passport office, embassy, school, employer, or identity-card authority. Before downloading, check whether the destination expects a white or off-white background, a particular head size, a neutral expression, visible shoulders, uncovered eyes, or a recent photograph. A perfectly measured picture can still be rejected if the background, lighting, clothing, or facial position does not meet the official specification.</p>
-              <p><strong>Use the gap as a cutting guide.</strong> The spacing control changes the distance between neighbouring photos, while the tool keeps a 10 mm edge margin around the sheet. A small gap uses the paper efficiently, but it can make trimming harder if you are cutting with scissors. A larger gap gives you more room for a ruler, guillotine, or paper trimmer. For a home printer, four to six millimetres is a useful starting point. If you take the file to a print shop, ask whether their cutter needs a wider border around the outside of the page.</p>
-              <p><strong>Print without accidental resizing.</strong> The most common reason an otherwise correct photo becomes the wrong size is the print dialog. When you print the downloaded PDF, choose A4 paper, portrait orientation, and 100% scale or Actual size. Disable Fit, Shrink oversized pages, Borderless expansion, and similar automatic options unless your printer documentation specifically requires them. If you use the PNG, open it in an application that lets you set the physical output size or print resolution. Do not paste the image into a document and drag its corners by eye; that can change the millimetre dimensions.</p>
-              <p><strong>Check one copy before printing a full batch.</strong> Place a ruler beside the first printed photo and measure its width and height from edge to edge. This quick check confirms that the printer has not scaled the sheet. It is especially worthwhile for visa applications, passport renewals, exam forms, and government appointments where a rejected photograph can cost more time than a sheet of paper. Once one copy is correct, the remaining photos on the A4 page will have the same dimensions and can be trimmed with confidence.</p>
-              <p><strong>Keep a sensible digital file.</strong> FitMyPhotoA4 processes your image in the browser and does not require an account or an upload. After downloading, keep the original photo and the generated sheet in clearly named folders if you expect to use them again. Requirements change, so use an older sheet only when its size and image date are still accepted by the organisation receiving it. For privacy, avoid leaving personal identity photographs in a shared computer’s Downloads folder after printing, and delete temporary copies from public print-shop machines when you are finished.</p>
+            <div className="guide-cards">
+              <article className="guide-card"><h4>Start with the right source.</h4><p>FitMyPhotoA4 can arrange almost any clear JPG or PNG, but the quality of the finished sheet still depends on the original photograph. A recent camera photo or a full-resolution phone image gives the best result. Avoid screenshots taken from social media, images forwarded through messaging apps, or pictures that have already been cropped several times. Those copies may look acceptable on a phone but become soft when they are printed and cut down to a small official size.</p></article>
+              <article className="guide-card"><h4>Pay attention to the face and background.</h4><p>The tool controls the physical rectangle and crops the image proportionally so the face is not stretched. It does not, however, decide whether a photograph meets the rules of a particular passport office, embassy, school, employer, or identity-card authority. Before downloading, check whether the destination expects a white or off-white background, a particular head size, a neutral expression, visible shoulders, uncovered eyes, or a recent photograph. A perfectly measured picture can still be rejected if the background, lighting, clothing, or facial position does not meet the official specification.</p></article>
+              <article className="guide-card"><h4>Use the gap as a cutting guide.</h4><p>The spacing control changes the distance between neighbouring photos, while the tool keeps a 10 mm edge margin around the sheet. A small gap uses the paper efficiently, but it can make trimming harder if you are cutting with scissors. A larger gap gives you more room for a ruler, guillotine, or paper trimmer. For a home printer, four to six millimetres is a useful starting point. If you take the file to a print shop, ask whether their cutter needs a wider border around the outside of the page.</p></article>
+              <article className="guide-card"><h4>Print without accidental resizing.</h4><p>The most common reason an otherwise correct photo becomes the wrong size is the print dialog. When you print the downloaded PDF, choose A4 paper, portrait orientation, and 100% scale or Actual size. Disable Fit, Shrink oversized pages, Borderless expansion, and similar automatic options unless your printer documentation specifically requires them. If you use the PNG, open it in an application that lets you set the physical output size or print resolution. Do not paste the image into a document and drag its corners by eye; that can change the millimetre dimensions.</p></article>
+              <article className="guide-card"><h4>Check one copy before printing a full batch.</h4><p>Place a ruler beside the first printed photo and measure its width and height from edge to edge. This quick check confirms that the printer has not scaled the sheet. It is especially worthwhile for visa applications, passport renewals, exam forms, and government appointments where a rejected photograph can cost more time than a sheet of paper. Once one copy is correct, the remaining photos on the A4 page will have the same dimensions and can be trimmed with confidence.</p></article>
+              <article className="guide-card"><h4>Keep a sensible digital file.</h4><p>FitMyPhotoA4 processes your image in the browser and does not require an account or an upload. After downloading, keep the original photo and the generated sheet in clearly named folders if you expect to use them again. Requirements change, so use an older sheet only when its size and image date are still accepted by the organisation receiving it. For privacy, avoid leaving personal identity photographs in a shared computer’s Downloads folder after printing, and delete temporary copies from public print-shop machines when you are finished.</p></article>
             </div>
           </div>
 
@@ -543,14 +549,14 @@ function Home() {
               <h3>Print quality, explained simply</h3>
               <p>Good results come from combining accurate dimensions with a sharp, well-prepared original image.</p>
             </div>
-            <div className="guide-copy">
-              <p><strong>What 300 DPI means.</strong> DPI, or dots per inch, describes how much image detail is available for printing. A small identity photograph still needs enough pixels to show clean edges, natural skin tones, and fine details such as hair and glasses. FitMyPhotoA4 prepares its export canvas around the A4 dimensions at 300 DPI, which is a common professional print setting. This does not magically add detail to a low-quality source, but it gives a good original the right space to reproduce clearly on paper.</p>
-              <p><strong>Why the PDF is useful.</strong> A PDF is often the easiest format for a print shop because it preserves the A4 page size and keeps the sheet together as one document. It is also less likely than a casually opened image to be resized by an application that is trying to fit content inside a window. The PNG download is useful when you want to inspect the sheet, place it into a document, or use an image-focused printer workflow. Whichever format you choose, the final print dialog is still important: a file can be perfectly measured and then be printed incorrectly if automatic scaling is applied.</p>
-              <p><strong>Colour and paper choices.</strong> Use the colour settings recommended by your printer and avoid applying artistic filters after the sheet has been generated. A neutral, evenly lit photo usually looks more natural on matte or satin paper than on highly glossy paper. Glossy paper can produce reflections that make a small face difficult to inspect, while very thin office paper may show ink bleed or curl. If an office or embassy specifies a paper type, follow that instruction first. For a normal application photo, a clean bright sheet with good contrast is usually preferable to an over-saturated or heavily sharpened print.</p>
-              <p><strong>Lighting matters more than editing.</strong> If you are taking a new source photo, face a large window or use soft light from in front of the subject. Avoid strong light from above, which can create shadows under the eyes, nose, and chin. Stand several steps away from the camera instead of using an extreme wide-angle selfie view. Keep the camera level with the face, leave enough space around the head, and ask the subject to look directly at the lens. A simple, well-lit original needs less correction and will look more professional after it is arranged on the A4 sheet.</p>
-              <p><strong>Use the size table as a starting point, not a legal guarantee.</strong> Passport and visa authorities can change their requirements, and different document types in the same country may use different dimensions. Some organisations ask for a digital upload with pixel dimensions rather than a physical print. Others require a photographer’s stamp, a specific paper finish, or a particular number of copies. Always compare the destination’s current instructions with the selected preset. When there is a difference, choose Custom size and enter the official measurement in millimetres instead of relying on a similar-looking preset.</p>
-              <p><strong>Troubleshooting a sheet that looks wrong.</strong> If the preview contains empty outlines, choose a photo first; those outlines are only a planning view. If the photo looks cropped, remember that the tool fills the selected rectangle without stretching it, so a portrait rectangle may trim the sides of a landscape original. Choose a source with a similar orientation or retake the photo with more space around the subject. If a downloaded image looks dark, check the original file in a normal image viewer and compare it with the preview. A very dark source, a display colour profile, or a paint application preview at a tiny zoom can make a correct image look different on screen.</p>
-              <p><strong>Plan for the whole appointment.</strong> A photo sheet is one part of a document application. Before you leave for an appointment, check the form, payment method, identity documents, copies, photographs, and any appointment confirmation. Keep a few spare prints in a flat envelope so they do not bend or collect fingerprints. If you are preparing photos for a family, create one sheet per person or label separate downloads clearly. This keeps different document sizes from being mixed together and makes the cutting stage faster.</p>
+            <div className="guide-cards">
+              <article className="guide-card"><h4>What 300 DPI means.</h4><p>DPI, or dots per inch, describes how much image detail is available for printing. A small identity photograph still needs enough pixels to show clean edges, natural skin tones, and fine details such as hair and glasses. FitMyPhotoA4 prepares its export canvas around the A4 dimensions at 300 DPI, which is a common professional print setting. This does not magically add detail to a low-quality source, but it gives a good original the right space to reproduce clearly on paper.</p></article>
+              <article className="guide-card"><h4>Why the PDF is useful.</h4><p>A PDF is often the easiest format for a print shop because it preserves the A4 page size and keeps the sheet together as one document. It is also less likely than a casually opened image to be resized by an application that is trying to fit content inside a window. The PNG download is useful when you want to inspect the sheet, place it into a document, or use an image-focused printer workflow. Whichever format you choose, the final print dialog is still important: a file can be perfectly measured and then be printed incorrectly if automatic scaling is applied.</p></article>
+              <article className="guide-card"><h4>Colour and paper choices.</h4><p>Use the colour settings recommended by your printer and avoid applying artistic filters after the sheet has been generated. A neutral, evenly lit photo usually looks more natural on matte or satin paper than on highly glossy paper. Glossy paper can produce reflections that make a small face difficult to inspect, while very thin office paper may show ink bleed or curl. If an office or embassy specifies a paper type, follow that instruction first. For a normal application photo, a clean bright sheet with good contrast is usually preferable to an over-saturated or heavily sharpened print.</p></article>
+              <article className="guide-card"><h4>Lighting matters more than editing.</h4><p>If you are taking a new source photo, face a large window or use soft light from in front of the subject. Avoid strong light from above, which can create shadows under the eyes, nose, and chin. Stand several steps away from the camera instead of using an extreme wide-angle selfie view. Keep the camera level with the face, leave enough space around the head, and ask the subject to look directly at the lens. A simple, well-lit original needs less correction and will look more professional after it is arranged on the A4 sheet.</p></article>
+              <article className="guide-card"><h4>Use the size table as a starting point, not a legal guarantee.</h4><p>Passport and visa authorities can change their requirements, and different document types in the same country may use different dimensions. Some organisations ask for a digital upload with pixel dimensions rather than a physical print. Others require a photographer’s stamp, a specific paper finish, or a particular number of copies. Always compare the destination’s current instructions with the selected preset. When there is a difference, choose Custom size and enter the official measurement in millimetres instead of relying on a similar-looking preset.</p></article>
+              <article className="guide-card"><h4>Troubleshooting a sheet that looks wrong.</h4><p>If the preview contains empty outlines, choose a photo first; those outlines are only a planning view. If the photo looks cropped, remember that the tool fills the selected rectangle without stretching it, so a portrait rectangle may trim the sides of a landscape original. Choose a source with a similar orientation or retake the photo with more space around the subject. If a downloaded image looks dark, check the original file in a normal image viewer and compare it with the preview. A very dark source, a display colour profile, or a paint application preview at a tiny zoom can make a correct image look different on screen.</p></article>
+              <article className="guide-card"><h4>Plan for the whole appointment.</h4><p>A photo sheet is one part of a document application. Before you leave for an appointment, check the form, payment method, identity documents, copies, photographs, and any appointment confirmation. Keep a few spare prints in a flat envelope so they do not bend or collect fingerprints. If you are preparing photos for a family, create one sheet per person or label separate downloads clearly. This keeps different document sizes from being mixed together and makes the cutting stage faster.</p></article>
             </div>
           </div>
 
@@ -563,12 +569,12 @@ function Home() {
               {FAQS.map((faq, index) => {
                 const isOpen = openFaq === index;
                 return (
-                  <div className="faq-item" key={faq.question}>
-                    <button className={`faq-button${isOpen ? ' open' : ''}`} type="button" onClick={() => setOpenFaq(isOpen ? null : index)} aria-expanded={isOpen} data-testid={`button-faq-${index + 1}`}>
+                  <article className={`faq-item${isOpen ? ' open' : ''}`} key={faq.question}>
+                    <button id={`faq-question-${index + 1}`} className={`faq-button${isOpen ? ' open' : ''}`} type="button" onClick={() => setOpenFaq(isOpen ? null : index)} aria-expanded={isOpen} aria-controls={`faq-answer-${index + 1}`} data-testid={`button-faq-${index + 1}`}>
                       <span>{String(index + 1).padStart(2, '0')} · {faq.question}</span><ChevronDown size={15} />
                     </button>
-                    {isOpen && <div className="faq-answer" data-testid={`text-faq-answer-${index + 1}`}>{faq.answer}</div>}
-                  </div>
+                    {isOpen && <div id={`faq-answer-${index + 1}`} className="faq-answer" role="region" aria-labelledby={`faq-question-${index + 1}`} data-testid={`text-faq-answer-${index + 1}`}>{faq.answer}</div>}
+                  </article>
                 );
               })}
             </div>
@@ -580,7 +586,6 @@ function Home() {
           <span><Grid3X3 size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> Check your authority’s requirements · print at 100%</span>
         </footer>
       </main>
-      <canvas ref={exportCanvasRef} className="sr-only" aria-hidden="true" />
     </div>
   );
 }
