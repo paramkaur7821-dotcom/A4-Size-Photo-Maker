@@ -1,10 +1,12 @@
-# [Project name]
+# A4 Size Photo Maker
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Browser tool that arranges uploaded photos on a print-ready A4 sheet with preset or custom dimensions.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/a4-size-photo-maker run dev` — run the main web app
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
+- `pnpm --filter @workspace/mockup-sandbox run dev` — run the component preview server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
