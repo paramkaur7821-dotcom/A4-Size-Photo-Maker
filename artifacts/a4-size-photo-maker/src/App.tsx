@@ -5,7 +5,6 @@ import {
   Download,
   FileDown,
   FileImage,
-  Grid3X3,
   Info,
   LockKeyhole,
   Printer,
@@ -15,6 +14,7 @@ import {
   ShieldCheck,
   UploadCloud,
 } from 'lucide-react';
+import { ALL_SEO_PAGES, type SEOPage } from './seoContent';
 
 type Preset = {
   key: string;
@@ -193,6 +193,142 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+function setMeta(name: string, content: string) {
+  let meta = document.querySelector(`meta[name="${name}"]`);
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('name', name);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
+}
+
+function setPropertyMeta(property: string, content: string) {
+  let meta = document.querySelector(`meta[property="${property}"]`);
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('property', property);
+    document.head.appendChild(meta);
+  }
+  meta.setAttribute('content', content);
+}
+
+function SiteHeader({ currentPath }: { currentPath: string }) {
+  const homeLink = currentPath === '/' ? '#top' : '/';
+  const toolLink = currentPath === '/' ? '#tool' : '/#tool';
+  const guideLink = currentPath === '/' ? '#guide' : '/#guide';
+
+  return (
+    <header className="site-header">
+      <div className="site-header-inner">
+        <a className="brand" href={homeLink} data-testid="link-brand">
+          <svg className="brand-logo" viewBox="0 0 40 34" aria-hidden="true">
+            <rect x="1.5" y="7.5" width="37" height="25" rx="2" />
+            <path d="M12 7.5 14.8 2h10.4L28 7.5" />
+            <circle cx="20" cy="20" r="7" />
+            <circle className="brand-logo-dot" cx="32.5" cy="12.5" r="1.5" />
+          </svg>
+          <span className="brand-copy">
+            <span className="brand-name">FitMyPhotoA4</span>
+            <span className="brand-tagline">professional photo sheets</span>
+          </span>
+        </a>
+        <nav className="site-nav" aria-label="Primary navigation">
+          <a href={toolLink}>Maker</a>
+          <a href={guideLink}>Guide</a>
+          <a href="/faq">FAQ</a>
+        </nav>
+        <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
+      </div>
+    </header>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="footer">
+      <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
+      <span className="footer-links">
+        <a href="/passport-photo-size-maker">Passport</a>
+        <a href="/pan-card-photo-maker">PAN Card</a>
+        <a href="/voter-id-photo-maker">Voter ID</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms-of-use">Terms</a>
+      </span>
+    </footer>
+  );
+}
+
+function ContentPage({ page }: { page: SEOPage }) {
+  useEffect(() => {
+    document.title = page.title;
+    setMeta('description', page.description);
+    setPropertyMeta('og:title', page.title);
+    setPropertyMeta('og:description', page.description);
+    setMeta('twitter:title', page.title);
+    setMeta('twitter:description', page.description);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', new URL(page.path, window.location.origin).toString());
+  }, [page]);
+
+  return (
+    <div className="app-shell">
+      <SiteHeader currentPath={page.path} />
+      <main className="main-wrap seo-page">
+        <section className="seo-hero" aria-labelledby="seo-page-title">
+          <div className="seo-hero-copy">
+            <div className="eyebrow">{page.eyebrow}</div>
+            <h1 id="seo-page-title">{page.title}</h1>
+            <p className="hero-intro">{page.intro}</p>
+            <div className="seo-hero-actions">
+              <a className="button button-primary" href="/#tool">Open the photo maker</a>
+              <a className="button button-line" href="/faq">Read common questions</a>
+            </div>
+          </div>
+          <div className="seo-hero-card">
+            <span className="section-kicker">FitMyPhotoA4</span>
+            <strong>Measured in millimetres.</strong>
+            <p>Local browser processing, practical print guidance, and a clean A4 layout for your next document photo.</p>
+            <span className="seo-hero-card-mark">210 × 297 mm</span>
+          </div>
+        </section>
+
+        <article className="seo-article">
+          {page.sections.map((section, index) => (
+            <section className="seo-section" key={section.heading}>
+              <div className="seo-section-index">{String(index + 1).padStart(2, '0')}</div>
+              <div className="seo-section-copy">
+                <h2>{section.heading}</h2>
+                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              </div>
+            </section>
+          ))}
+        </article>
+
+        <section className="seo-related" aria-label="Related FitMyPhotoA4 pages">
+          <div>
+            <div className="section-kicker">Keep exploring</div>
+            <h2>One tool.<br /><em>Every useful size.</em></h2>
+          </div>
+          <div className="seo-related-links">
+            <a href="/passport-photo-size-maker">Passport photo size maker <span>→</span></a>
+            <a href="/pan-card-photo-maker">PAN Card photo maker <span>→</span></a>
+            <a href="/voter-id-photo-maker">Voter ID photo maker <span>→</span></a>
+            <a href="/privacy-policy">Privacy Policy <span>→</span></a>
+            <a href="/terms-of-use">Terms of Use <span>→</span></a>
+          </div>
+        </section>
+      </main>
+      <div className="main-wrap"><SiteFooter /></div>
+    </div>
+  );
+}
+
 function Home() {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -243,6 +379,13 @@ function Home() {
       }
       tag.setAttribute('content', content);
     });
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', new URL('/', window.location.origin).toString());
   }, []);
 
   useEffect(() => {
@@ -342,28 +485,7 @@ function Home() {
 
   return (
     <div className="app-shell">
-      <header className="site-header">
-        <div className="site-header-inner">
-          <a className="brand" href="#top" data-testid="link-brand">
-            <svg className="brand-logo" viewBox="0 0 40 34" aria-hidden="true">
-              <rect x="1.5" y="7.5" width="37" height="25" rx="2" />
-              <path d="M12 7.5 14.8 2h10.4L28 7.5" />
-              <circle cx="20" cy="20" r="7" />
-              <circle className="brand-logo-dot" cx="32.5" cy="12.5" r="1.5" />
-            </svg>
-            <span className="brand-copy">
-              <span className="brand-name">FitMyPhotoA4</span>
-              <span className="brand-tagline">professional photo sheets</span>
-            </span>
-          </a>
-          <nav className="site-nav" aria-label="Primary navigation">
-            <a href="#tool">Maker</a>
-            <a href="#guide">Guide</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
-        </div>
-      </header>
+      <SiteHeader currentPath="/" />
 
       <main id="top" className="main-wrap">
         <section className="hero" aria-labelledby="page-title">
@@ -581,13 +703,29 @@ function Home() {
           </div>
         </section>
 
-        <footer className="footer">
-          <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
-          <span><Grid3X3 size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> Check your authority’s requirements · print at 100%</span>
-        </footer>
+        <SiteFooter />
       </main>
     </div>
   );
 }
 
-export default Home;
+function App() {
+  const [currentPath, setCurrentPath] = useState(() => {
+    const path = window.location.pathname.replace(/\/+$/, '');
+    return path || '/';
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.replace(/\/+$/, '');
+      setCurrentPath(path || '/');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const page = ALL_SEO_PAGES[currentPath];
+  return page ? <ContentPage page={page} /> : <Home />;
+}
+
+export default App;
