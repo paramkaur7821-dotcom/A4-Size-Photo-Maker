@@ -61,6 +61,7 @@ const A4_HEIGHT = 297;
 const DEFAULT_MARGIN = 10;
 const STANDARD_DPI = 300;
 const HD_DPI = 600;
+const LOGO_SRC = `${import.meta.env.BASE_URL}fitmyphoto-logo.jfif`;
 
 const PRESETS: Preset[] = [
   { key: 'stamp', label: 'Stamp size', detail: '20 × 25 mm', width: 20, height: 25 },
@@ -233,29 +234,28 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
   const homeLink = currentPath === '/' ? '#top' : '/';
   const toolLink = currentPath === '/' ? '#tool' : '/#tool';
   const guideLink = '/how-it-works';
+  const navClass = (path: string) => {
+    const active = currentPath === path || (path === '/blog' && currentPath.startsWith('/blog/'));
+    return active ? 'is-active' : undefined;
+  };
 
   return (
     <header className="site-header">
       <div className="site-header-inner">
         <a className="brand" href={homeLink} data-testid="link-brand">
-          <svg className="brand-logo" viewBox="0 0 40 34" aria-hidden="true">
-            <rect x="1.5" y="7.5" width="37" height="25" rx="2" />
-            <path d="M12 7.5 14.8 2h10.4L28 7.5" />
-            <circle cx="20" cy="20" r="7" />
-            <circle className="brand-logo-dot" cx="32.5" cy="12.5" r="1.5" />
-          </svg>
+          <img className="brand-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
           <span className="brand-copy">
             <span className="brand-name">FitMyPhotoA4</span>
             <span className="brand-tagline">professional photo sheets</span>
           </span>
         </a>
         <nav className="site-nav" aria-label="Primary navigation">
-          <a href={toolLink}>Maker</a>
-          <a href="/blog">Blog</a>
-          <a href={guideLink}>How it works</a>
-          <a href="/faq">FAQ</a>
-          <a href="/about-us">About</a>
-          <a href="/contact-us">Contact</a>
+          <a className={navClass('/')} href={toolLink} aria-current={currentPath === '/' ? 'page' : undefined}>Maker</a>
+          <a className={navClass('/blog')} href="/blog" aria-current={currentPath.startsWith('/blog') ? 'page' : undefined}>Blog</a>
+          <a className={navClass('/how-it-works')} href={guideLink} aria-current={currentPath === '/how-it-works' ? 'page' : undefined}>How it works</a>
+          <a className={navClass('/faq')} href="/faq" aria-current={currentPath === '/faq' ? 'page' : undefined}>FAQ</a>
+          <a className={navClass('/about-us')} href="/about-us" aria-current={currentPath === '/about-us' ? 'page' : undefined}>About</a>
+          <a className={navClass('/contact-us')} href="/contact-us" aria-current={currentPath === '/contact-us' ? 'page' : undefined}>Contact</a>
         </nav>
         <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
       </div>
