@@ -1,0 +1,1 @@
+- [Vite SPA canonical handling](seo-vite-canonical.md) — set route canonicals at runtime; a static href="/" can trigger an EISDIR build failure.

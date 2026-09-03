@@ -216,7 +216,7 @@ function setPropertyMeta(property: string, content: string) {
 function SiteHeader({ currentPath }: { currentPath: string }) {
   const homeLink = currentPath === '/' ? '#top' : '/';
   const toolLink = currentPath === '/' ? '#tool' : '/#tool';
-  const guideLink = currentPath === '/' ? '#guide' : '/#guide';
+  const guideLink = '/how-it-works';
 
   return (
     <header className="site-header">
@@ -252,10 +252,73 @@ function SiteFooter() {
         <a href="/passport-photo-size-maker">Passport</a>
         <a href="/pan-card-photo-maker">PAN Card</a>
         <a href="/voter-id-photo-maker">Voter ID</a>
+        <a href="/how-it-works">How it works</a>
         <a href="/privacy-policy">Privacy</a>
         <a href="/terms-of-use">Terms</a>
       </span>
     </footer>
+  );
+}
+
+function TutorialVisualGuide() {
+  return (
+    <section className="tutorial-visuals" aria-labelledby="tutorial-visual-title">
+      <div className="tutorial-visual-intro">
+        <div>
+          <div className="section-kicker">See the workflow</div>
+          <h2 id="tutorial-visual-title">Three calm steps.<br /><em>One clean sheet.</em></h2>
+        </div>
+        <p>These visual screens mirror the controls inside FitMyPhotoA4, so you know what to look for before you start. The photo stays in your browser while you move from upload to a measured A4 preview and finally to a print-ready download.</p>
+      </div>
+
+      <div className="tutorial-step-grid">
+        <article className="tutorial-step-card">
+          <div className="tutorial-step-heading"><span>01</span><div><strong>Upload</strong><small>Choose one clear JPG or PNG</small></div></div>
+          <figure className="tutorial-screen upload-screen" aria-label="Upload screen showing the Choose photo button">
+            <div className="screen-bar"><span>Build your sheet</span><span>01 / 02</span></div>
+            <div className="screen-upload-zone">
+              <div className="screen-upload-icon"><UploadCloud size={17} /></div>
+              <strong>Drop a photo here</strong>
+              <span>JPG or PNG · local in this browser</span>
+              <span className="screen-button screen-button-primary"><FileImage size={12} /> Choose photo</span>
+              <div className="screen-check"><Check size={11} /> passport-original.jpg</div>
+            </div>
+            <div className="screen-note"><ShieldCheck size={12} /> Nothing is sent or stored.</div>
+          </figure>
+          <p className="tutorial-caption">Pick the largest, sharpest original you have. A full-resolution camera or phone photo gives the crop more detail.</p>
+        </article>
+
+        <article className="tutorial-step-card">
+          <div className="tutorial-step-heading"><span>02</span><div><strong>Arrange</strong><small>Set the size and inspect the crop</small></div></div>
+          <figure className="tutorial-screen arrange-screen" aria-label="Arrange screen showing the A4 live preview and measured photo grid">
+            <div className="screen-bar"><span>A4 live preview</span><span>portrait / 100%</span></div>
+            <div className="mini-a4">
+              <div className="mini-a4-label">FitMyPhotoA4 <span>210 × 297 mm</span></div>
+              <div className="mini-photo-grid">
+                {Array.from({ length: 12 }, (_, index) => <span key={index} className="mini-photo" />)}
+              </div>
+            </div>
+            <div className="screen-preview-footer"><strong>24</strong><span>photos fit on this A4 sheet</span><Ruler size={13} /></div>
+          </figure>
+          <p className="tutorial-caption">Choose Passport, PAN Card, Voter ID, or Custom size. Then adjust the cutting gap and check that the face is comfortably inside each rectangle.</p>
+        </article>
+
+        <article className="tutorial-step-card">
+          <div className="tutorial-step-heading"><span>03</span><div><strong>Download</strong><small>Print at actual size</small></div></div>
+          <figure className="tutorial-screen download-screen" aria-label="Download screen showing PNG and Download PDF actions">
+            <div className="screen-bar"><span>Ready to print</span><span>300 DPI</span></div>
+            <div className="download-sheet">
+              <div className="pdf-icon"><FileDown size={22} /></div>
+              <strong>a4-photo-sheet-35x45mm.pdf</strong>
+              <span>A4 portrait · measured layout</span>
+            </div>
+            <div className="screen-download-actions"><span className="screen-button">PNG</span><span className="screen-button screen-button-primary"><Download size={12} /> Download PDF</span></div>
+            <div className="print-rule"><Printer size={12} /><strong>Print at 100%</strong><span>Actual size · A4 paper</span></div>
+          </figure>
+          <p className="tutorial-caption">Download PDF for a print shop or PNG for an image workflow. In the print dialog, turn off “Fit to page” and measure one test copy.</p>
+        </article>
+      </div>
+    </section>
   );
 }
 
@@ -287,7 +350,7 @@ function ContentPage({ page }: { page: SEOPage }) {
             <p className="hero-intro">{page.intro}</p>
             <div className="seo-hero-actions">
               <a className="button button-primary" href="/#tool">Open the photo maker</a>
-              <a className="button button-line" href="/faq">Read common questions</a>
+              <a className="button button-line" href={page.faqItems ? '#tutorial-faq' : '/faq'}>Read common questions</a>
             </div>
           </div>
           <div className="seo-hero-card">
@@ -297,6 +360,8 @@ function ContentPage({ page }: { page: SEOPage }) {
             <span className="seo-hero-card-mark">210 × 297 mm</span>
           </div>
         </section>
+
+        {page.path === '/how-it-works' && <TutorialVisualGuide />}
 
         <article className="seo-article">
           {page.sections.map((section, index) => (
@@ -310,6 +375,26 @@ function ContentPage({ page }: { page: SEOPage }) {
           ))}
         </article>
 
+        {page.faqItems && (
+          <section className="tutorial-faq" id="tutorial-faq" aria-labelledby="tutorial-faq-title">
+            <div className="section-head">
+              <div>
+                <div className="section-kicker">Tutorial FAQ</div>
+                <h2 id="tutorial-faq-title">Questions before<br /><em>your first sheet.</em></h2>
+              </div>
+              <p>Quick answers for new users who want to upload, arrange, download, and print without guesswork.</p>
+            </div>
+            <div className="faq-list">
+              {page.faqItems.map((faq, index) => (
+                <details className="tutorial-faq-item" key={faq.question} open={index === 0}>
+                  <summary><span>{String(index + 1).padStart(2, '0')} · {faq.question}</span><ChevronDown size={15} /></summary>
+                  <p>{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="seo-related" aria-label="Related FitMyPhotoA4 pages">
           <div>
             <div className="section-kicker">Keep exploring</div>
@@ -319,6 +404,7 @@ function ContentPage({ page }: { page: SEOPage }) {
             <a href="/passport-photo-size-maker">Passport photo size maker <span>→</span></a>
             <a href="/pan-card-photo-maker">PAN Card photo maker <span>→</span></a>
             <a href="/voter-id-photo-maker">Voter ID photo maker <span>→</span></a>
+            <a href="/how-it-works">How it works tutorial <span>→</span></a>
             <a href="/privacy-policy">Privacy Policy <span>→</span></a>
             <a href="/terms-of-use">Terms of Use <span>→</span></a>
           </div>

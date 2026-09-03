@@ -11,6 +11,7 @@ export type SEOPage = {
   eyebrow: string;
   intro: string;
   sections: SEOSection[];
+  faqItems?: { question: string; answer: string }[];
 };
 
 const passportSections: SEOSection[] = [
@@ -516,6 +517,102 @@ const termsSections: SEOSection[] = [
   },
 ];
 
+const howItWorksSections: SEOSection[] = [
+  {
+    heading: 'What FitMyPhotoA4 does',
+    paragraphs: [
+      'FitMyPhotoA4 turns one clear JPG or PNG into a measured A4 photo sheet. Instead of opening a word processor, dragging an image by eye, copying it several times, and hoping the printer keeps the same dimensions, you choose a photo size in millimetres and let the maker calculate a repeatable grid. The live preview shows the page before you download it, and the fit count tells you how many copies are available at the current size and cutting gap. The result is a simple sheet you can take to a home printer or a local print shop.',
+      'The tool is a layout assistant, not an official approval checker. It can keep a 35 × 45 mm passport rectangle or a 25 × 35 mm PAN Card or Voter ID rectangle consistent, but it cannot know whether your authority wants a particular background, head height, expression, paper, age of photograph, signature, or digital file. Start with the receiving authority’s current instructions. Then use this tutorial to move through the three practical stages: upload the right original, arrange and inspect the measured sheet, and download and print it without accidental resizing.',
+    ],
+  },
+  {
+    heading: 'Before you begin: prepare the right original',
+    paragraphs: [
+      'The first step happens before you open the file picker. Choose the largest clear original photograph available on your device. A full-resolution camera image is usually a better starting point than a screenshot, a social-media download, or a picture forwarded through a messaging app. Those copies may look fine on a phone but can become soft when the face is printed at a few centimetres. Leave comfortable space around the head and shoulders so a portrait crop does not cut into the hair or required shoulder area.',
+      'Use a recent, front-facing image with soft light from in front of the subject. Avoid strong shadows, a bright window behind the person, a visible wall corner, patterned backgrounds, beauty filters, or face-shaping edits. If an office or portal gives a precise rule for glasses, head coverings, expression, background, or image date, check that rule before using the maker. A clear source makes every later stage easier: the crop is more natural, the preview is easier to inspect, and the final print has better detail.',
+    ],
+  },
+  {
+    heading: 'Step 1 — Upload your photo',
+    paragraphs: [
+      'Open the maker and look for the Build your sheet panel. You can drag a JPG or PNG into the dashed upload area, or choose Choose photo to open your device’s file picker. The interface accepts JPG and PNG files so the browser can read a common camera or phone image without a conversion step. Select one image at a time and watch for the filename and check mark that confirm the photo has loaded. If the image is not accepted, choose a valid JPG or PNG rather than renaming a different file type.',
+      'The upload is designed around local browser processing. The selected image is read by the active browser session so it can be cropped, previewed, and used to create the download on your device. You do not need an account or a photo-processing queue for the normal flow. Even so, use a private device when working with an identity photograph. When you finish, use Reset, close the tab, and remove the downloaded sheet from a shared computer or print-shop machine. Local processing helps, while device and file security remain your responsibility.',
+    ],
+  },
+  {
+    heading: 'Step 2 — Choose the correct photo size',
+    paragraphs: [
+      'After the image loads, open the Photo type menu. Choose Passport size for a 35 × 45 mm starting layout, PAN Card photo for 25 × 35 mm, or Voter ID photo for 25 × 35 mm when that matches the current application instructions. The tool also includes stamp, US visa, Canada passport, China passport, and UAE passport starting sizes. The value beside the control shows the selected width and height in millimetres, so you do not have to remember which preset is active.',
+      'If your form asks for another measurement, choose Custom size and enter the exact width and height in millimetres. Do not select the closest-looking preset or change the printer scale to compensate for a different authority rule. As you change the size, the number of columns, rows, and total photos updates in the preview area. This immediate feedback is useful when a less common visa, school, employment, residence, or local form asks for a particular rectangle.',
+    ],
+  },
+  {
+    heading: 'Step 3 — Arrange the A4 sheet',
+    paragraphs: [
+      'The A4 live preview is the main arrangement screen. It shows a portrait page measuring 210 × 297 mm, with a 10 mm quiet edge margin and repeated copies of your selected rectangle. The maker calculates rows and columns using the physical measurements rather than the size of the browser window. That is why the fit count is more useful than estimating how many images appear to fit visually on a monitor. The preview is a working view of the page, not a screenshot that you should copy into another document.',
+      'Use the Cutting space control to decide how much room sits between neighbouring photos. A small gap makes efficient use of paper, while a wider gap gives scissors, a ruler, or a small paper trimmer more room. Four to six millimetres is a practical starting point for many home-print workflows, but the best choice depends on your tool and the print shop’s cutter. Watch the fit count as you adjust the gap. Do not remove the outer safety margin just to fit one extra copy.',
+    ],
+  },
+  {
+    heading: 'Step 4 — Inspect the crop and quality',
+    paragraphs: [
+      'Look at the face in the A4 preview before downloading. FitMyPhotoA4 fills the selected rectangle proportionally, so it will crop the sides of a wide image or remove unused space from a tall image instead of stretching the face. Confirm that the head remains inside the frame, both eyes and important facial features are visible, and the background is even. If the crop is too tight, return to the original image and choose one with more space around the subject. Retaking the photograph is usually safer than forcing a poor source to fit.',
+      'The optional Black & White setting applies grayscale to the generated sheet, and HD Quality prepares a larger 600 DPI export instead of the standard 300 DPI output. Use those settings only when they suit the destination and printer. HD cannot restore detail that was missing from a tiny or blurry original, and a grayscale image may be unsuitable when colour is required. Keep the original colour file so you can create another version later without repeated compression.',
+    ],
+  },
+  {
+    heading: 'Step 5 — Download PNG or PDF',
+    paragraphs: [
+      'When the crop, size, spacing, and output settings look correct, choose the format that matches your next step. Download PDF is usually the easiest choice for a print shop because it keeps the A4 page together as a print document. PNG is useful when your printer or image application expects a raster file, or when you want to inspect the sheet before sending it elsewhere. Both files are prepared locally in the browser after a valid image has loaded, and the controls stay disabled until there is a photo to export.',
+      'Give the downloaded file a clear name that identifies the person and purpose without placing unnecessary personal information in a shared folder. Keep the original and the generated sheet separate so you can create a new size if the authority’s instructions change. Do not take a screenshot of the preview as your final file. A screenshot has no reliable physical relationship to A4 and can lose the exact page dimensions that the PDF or generated PNG preserves.',
+    ],
+  },
+  {
+    heading: 'Step 6 — Print at actual size',
+    paragraphs: [
+      'Open the downloaded PDF in a reliable viewer and choose A4 paper with portrait orientation. Select Actual size, 100%, or Do not scale. Turn off Fit to page, Shrink oversized pages, Scale to printable area, Borderless expansion, and similar automatic options unless your printer documentation specifically requires one of them. If you use a PNG, print from an application that respects the intended physical dimensions or print resolution. Do not paste the image into a document and resize it by dragging the corners.',
+      'Print one test page before producing a complete batch for a passport appointment, PAN application, Voter ID request, visa, or school form. Measure one finished photo from outside edge to outside edge with a ruler. If the size is wrong, correct the printer dialogue rather than changing the photo preset. Print-shop software sometimes defaults to Letter paper or silently shrinks a page to avoid its margins. Tell the operator that the file is an A4 layout and must be printed at 100 percent.',
+    ],
+  },
+  {
+    heading: 'Cut, store, and troubleshoot with confidence',
+    paragraphs: [
+      'Once the test print measures correctly, cut along the photo edges using clean scissors, a ruler, or a paper trimmer. A wider cutting gap can help you avoid touching the next face. Let fresh ink dry before stacking the copies, keep them flat in a clean envelope, and avoid folding the face. If the sheet is empty, make sure a valid image finished loading. If the crop looks wrong, choose a better original. If the PDF button reports that its library is still loading, wait briefly and try again instead of opening an unknown replacement website.',
+      'Keep different people and different document types on separate, labelled sheets. A 25 × 35 mm photo for one application may look almost identical to another small ID photo, and an unlabeled stack can lead to a mix-up. Before an appointment, check the official form, payment, identity documents, signatures, photograph count, and any digital-upload requirement. Delete extra files from shared devices after printing. For detailed document-specific advice, use the Passport, PAN Card, and Voter ID guides alongside this tutorial.',
+    ],
+  },
+  {
+    heading: 'A calm three-stage workflow',
+    paragraphs: [
+      'The whole process can be remembered as Upload, Arrange, Download. Upload means selecting a clear, recent original and confirming the filename. Arrange means choosing the authority’s measurement, checking the proportional crop, setting a sensible cutting gap, and reading the A4 fit count. Download means choosing PDF or PNG, printing at 100 percent on A4, and measuring a test copy before you make spares. Each stage has a simple checkpoint, so you do not have to trust a result that you have not inspected.',
+      'This workflow saves time because it separates image quality, physical measurement, and printer behaviour instead of trying to fix all three at once. It also builds trust through visible steps: the upload panel confirms what was selected, the live preview shows how the sheet is arranged, and the download controls make the final format explicit. FitMyPhotoA4 does not promise official acceptance, but it makes the mechanical part of preparing a repeatable photo sheet clear, local, and easy to verify.',
+    ],
+  },
+];
+
+const howItWorksFaqs = [
+  {
+    question: 'Do I need to upload my photo to a server?',
+    answer: 'No account or photo-processing queue is needed for the normal workflow. The browser reads the selected JPG or PNG locally to create the preview and download. Use a private device, then reset the maker and remove downloaded copies from shared computers.',
+  },
+  {
+    question: 'Which size should I choose first?',
+    answer: 'Choose the preset that matches the current instructions for your application: Passport is 35 × 45 mm, while PAN Card and Voter ID start at 25 × 35 mm. If the authority gives another measurement, use Custom size in millimetres.',
+  },
+  {
+    question: 'Why does my photo look cropped?',
+    answer: 'The maker fills the selected rectangle without stretching the image. When the original and selected rectangle have different proportions, some edges are cropped. Use a sharper original with more space around the subject instead of stretching the face.',
+  },
+  {
+    question: 'Should I download PNG or PDF?',
+    answer: 'PDF is usually best for a print shop because it keeps the A4 page together. PNG works well when an image-based printer workflow is required. Whichever format you choose, print at 100% or Actual size and measure one copy.',
+  },
+  {
+    question: 'How can I trust the final physical size?',
+    answer: 'The maker calculates the layout in millimetres, but your printer can still resize a page. Select A4 and 100% / Actual size, turn off Fit to page, and measure one test photo with a ruler before printing the full batch.',
+  },
+];
+
 export const SEO_PAGES: Record<string, SEOPage> = {
   '/passport-photo-size-maker': {
     path: '/passport-photo-size-maker',
@@ -577,4 +674,14 @@ export const FAQ_PAGE: SEOPage = {
 export const ALL_SEO_PAGES: Record<string, SEOPage> = {
   ...SEO_PAGES,
   '/faq': FAQ_PAGE,
+  '/how-it-works': {
+    path: '/how-it-works',
+    navLabel: 'How it works',
+    title: 'How It Works | Upload, Arrange and Download A4 Photos',
+    description: 'Learn how to use FitMyPhotoA4 step by step: upload a photo, arrange exact-size copies on A4, download, print, and check the result.',
+    eyebrow: 'How it works',
+    intro: 'Follow a calm three-stage workflow with visual guides: upload your original, arrange a measured A4 sheet, then download and print it at actual size.',
+    sections: howItWorksSections,
+    faqItems: howItWorksFaqs,
+  },
 };
