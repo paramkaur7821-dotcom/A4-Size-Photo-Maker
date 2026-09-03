@@ -15,6 +15,22 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { ALL_SEO_PAGES, type SEOPage } from './seoContent';
+import {
+  ABOUT_PAGE,
+  BLOG_ARTICLE_PAGES,
+  BLOG_INDEX_PAGE,
+  BLOG_POSTS,
+  CONTACT_EMAIL,
+  CONTACT_PAGE,
+} from './blogContent';
+
+const APP_PAGES: Record<string, SEOPage> = {
+  ...ALL_SEO_PAGES,
+  ...BLOG_ARTICLE_PAGES,
+  '/blog': BLOG_INDEX_PAGE,
+  '/about-us': ABOUT_PAGE,
+  '/contact-us': CONTACT_PAGE,
+};
 
 type Preset = {
   key: string;
@@ -235,8 +251,11 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
         </a>
         <nav className="site-nav" aria-label="Primary navigation">
           <a href={toolLink}>Maker</a>
-          <a href={guideLink}>Guide</a>
+          <a href="/blog">Blog</a>
+          <a href={guideLink}>How it works</a>
           <a href="/faq">FAQ</a>
+          <a href="/about-us">About</a>
+          <a href="/contact-us">Contact</a>
         </nav>
         <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
       </div>
@@ -253,6 +272,9 @@ function SiteFooter() {
         <a href="/pan-card-photo-maker">PAN Card</a>
         <a href="/voter-id-photo-maker">Voter ID</a>
         <a href="/how-it-works">How it works</a>
+        <a href="/blog">Blog</a>
+        <a href="/about-us">About</a>
+        <a href="/contact-us">Contact</a>
         <a href="/privacy-policy">Privacy</a>
         <a href="/terms-of-use">Terms</a>
       </span>
@@ -322,6 +344,71 @@ function TutorialVisualGuide() {
   );
 }
 
+function BlogCards() {
+  return (
+    <section className="blog-card-section" aria-labelledby="blog-card-title">
+      <div className="section-kicker">Read the guides</div>
+      <div className="blog-card-heading">
+        <h2 id="blog-card-title">Answers for the<br /><em>search box.</em></h2>
+        <p>Start with the document you are preparing. Each article explains the common size, what to verify with the official source, and how to turn the confirmed measurement into a clean A4 sheet.</p>
+      </div>
+      <div className="blog-card-grid">
+        {BLOG_POSTS.map((post, index) => (
+          <a className="blog-card" href={post.path} key={post.path}>
+            <div className="blog-card-top"><span>{String(index + 1).padStart(2, '0')}</span><span>{post.readTime}</span></div>
+            <div>
+              <div className="blog-card-category">{post.category}</div>
+              <h3>{post.title}</h3>
+              <p>{post.description}</p>
+            </div>
+            <span className="blog-card-link">Read article <span>→</span></span>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ContactForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const sendMessage = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+    const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setSubmitted(true);
+    window.location.href = mailto;
+  };
+
+  return (
+    <section className="contact-panel" aria-labelledby="contact-form-title">
+      <div className="contact-panel-copy">
+        <div className="section-kicker">Write to us</div>
+        <h2 id="contact-form-title">A clear question<br /><em>gets a clear reply.</em></h2>
+        <p>Use this form for product questions, workflow feedback, accessibility notes, or a broken link. It opens a draft in your email app so you can review it before sending.</p>
+        <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL} <span>↗</span></a>
+        <div className="contact-boundary"><ShieldCheck size={15} /><span>Please do not send passport numbers, PAN numbers, identity photographs, passwords, or payment details.</span></div>
+      </div>
+      <form className="contact-form" onSubmit={sendMessage}>
+        <label htmlFor="contact-name">Your name</label>
+        <input id="contact-name" value={name} onChange={(event) => setName(event.target.value)} required />
+        <label htmlFor="contact-email">Your email</label>
+        <input id="contact-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+        <label htmlFor="contact-subject">Subject</label>
+        <input id="contact-subject" value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="How can we help?" required />
+        <label htmlFor="contact-message">Message</label>
+        <textarea id="contact-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={5} placeholder="Tell us what happened and which page or step you were using." required />
+        <button className="button button-primary button-wide" type="submit"><span>Open email draft</span> <span>→</span></button>
+        {submitted && <p className="contact-success" role="status">Your email draft should be open. Review it before sending.</p>}
+      </form>
+    </section>
+  );
+}
+
 function ContentPage({ page }: { page: SEOPage }) {
   useEffect(() => {
     document.title = page.title;
@@ -362,6 +449,8 @@ function ContentPage({ page }: { page: SEOPage }) {
         </section>
 
         {page.path === '/how-it-works' && <TutorialVisualGuide />}
+        {page.path === '/blog' && <BlogCards />}
+        {page.path === '/contact-us' && <ContactForm />}
 
         <article className="seo-article">
           {page.sections.map((section, index) => (
@@ -405,6 +494,9 @@ function ContentPage({ page }: { page: SEOPage }) {
             <a href="/pan-card-photo-maker">PAN Card photo maker <span>→</span></a>
             <a href="/voter-id-photo-maker">Voter ID photo maker <span>→</span></a>
             <a href="/how-it-works">How it works tutorial <span>→</span></a>
+            <a href="/blog">Photo size guides <span>→</span></a>
+            <a href="/about-us">About FitMyPhotoA4 <span>→</span></a>
+            <a href="/contact-us">Contact the team <span>→</span></a>
             <a href="/privacy-policy">Privacy Policy <span>→</span></a>
             <a href="/terms-of-use">Terms of Use <span>→</span></a>
           </div>
@@ -810,7 +902,7 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const page = ALL_SEO_PAGES[currentPath];
+  const page = APP_PAGES[currentPath];
   return page ? <ContentPage page={page} /> : <Home />;
 }
 
