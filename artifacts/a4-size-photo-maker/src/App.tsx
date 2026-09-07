@@ -251,11 +251,11 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
         </a>
         <nav className="site-nav" aria-label="Primary navigation">
           <a className={navClass('/')} href={toolLink} aria-current={currentPath === '/' ? 'page' : undefined}>Maker</a>
-          <a className={navClass('/blog')} href="/blog" aria-current={currentPath.startsWith('/blog') ? 'page' : undefined}>Blog</a>
-          <a className={navClass('/how-it-works')} href={guideLink} aria-current={currentPath === '/how-it-works' ? 'page' : undefined}>How it works</a>
-          <a className={navClass('/faq')} href="/faq" aria-current={currentPath === '/faq' ? 'page' : undefined}>FAQ</a>
           <a className={navClass('/about-us')} href="/about-us" aria-current={currentPath === '/about-us' ? 'page' : undefined}>About</a>
           <a className={navClass('/contact-us')} href="/contact-us" aria-current={currentPath === '/contact-us' ? 'page' : undefined}>Contact</a>
+          <a className={navClass('/how-it-works')} href={guideLink} aria-current={currentPath === '/how-it-works' ? 'page' : undefined}>How it works</a>
+          <a className={navClass('/faq')} href="/faq" aria-current={currentPath === '/faq' ? 'page' : undefined}>FAQ</a>
+          <a className={navClass('/blog')} href="/blog" aria-current={currentPath.startsWith('/blog') ? 'page' : undefined}>Blog</a>
         </nav>
         <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
       </div>
@@ -266,7 +266,13 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
 function SiteFooter() {
   return (
     <footer className="footer">
-      <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
+      <div className="footer-brand">
+        <img className="footer-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
+        <div>
+          <strong>FitMyPhotoA4</strong>
+          <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
+        </div>
+      </div>
       <span className="footer-links">
         <a href="/passport-photo-size-maker">Passport</a>
         <a href="/pan-card-photo-maker">PAN Card</a>
