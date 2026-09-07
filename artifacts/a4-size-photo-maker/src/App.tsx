@@ -257,7 +257,6 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
           <a className={navClass('/faq')} href="/faq" aria-current={currentPath === '/faq' ? 'page' : undefined}>FAQ</a>
           <a className={navClass('/blog')} href="/blog" aria-current={currentPath.startsWith('/blog') ? 'page' : undefined}>Blog</a>
         </nav>
-        <div className="header-note"><ShieldCheck size={14} /> Local-only · no upload</div>
       </div>
     </header>
   );
