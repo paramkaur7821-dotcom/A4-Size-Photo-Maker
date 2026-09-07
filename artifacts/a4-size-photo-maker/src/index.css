@@ -532,3 +532,66 @@ input[type="range"] { display: block; width: 100%; accent-color: hsl(var(--prima
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Readable type scale: keep the editorial look while improving scanability. */
+body { font-size: 15px; }
+.eyebrow, .section-kicker { font-size: 12px; }
+.hero-intro { font-size: 16px; }
+.site-nav a { font-size: 16px; }
+.header-note { font-size: 12px; }
+.button { font-size: 13px; }
+.panel-label { font-size: 14px; }
+.upload-zone strong { font-size: 14px; }
+.upload-zone p { font-size: 12px; }
+.control-heading label { font-size: 13px; }
+.field-label { font-size: 11px; }
+.preset strong { font-size: 12px; }
+.toggle-copy strong { font-size: 12px; }
+.tip { font-size: 11px; }
+.preview-meta, .fit-count span, .privacy-line { font-size: 11px; }
+.preview-empty { font-size: 12px; }
+.content p { font-size: 15px; }
+.metric span { font-size: 11px; }
+.section-head p { font-size: 13px; }
+.size-table { font-size: 13px; }
+.size-table th { font-size: 11px; }
+.money-note p { font-size: 13px; }
+.step strong { font-size: 14px; }
+.step p { font-size: 13px; }
+.mistake strong { font-size: 13px; }
+.mistake p { font-size: 12px; }
+.faq-button { font-size: 13px; }
+.faq-answer { font-size: 12px; }
+.footer { font-size: 11px; }
+.footer-brand strong { font-size: 14px; }
+.seo-hero-card p { font-size: 13px; }
+.seo-section-copy p { font-size: 15px; }
+.seo-related-links a { font-size: 14px; }
+.tutorial-visual-intro p { font-size: 14px; }
+.tutorial-step-heading strong { font-size: 15px; }
+.tutorial-step-heading small { font-size: 11px; }
+.screen-bar { font-size: 10px; }
+.screen-upload-zone strong { font-size: 12px; }
+.screen-upload-zone > span:not(.screen-button), .screen-button, .screen-check, .screen-note { font-size: 10px; }
+.tutorial-caption { font-size: 12px; }
+.tutorial-faq-item summary { font-size: 13px; }
+.tutorial-faq-item p { font-size: 13px; }
+.blog-card-heading p { font-size: 14px; }
+.blog-card-category { font-size: 11px; }
+.blog-card p { font-size: 13px; }
+.blog-card-link { font-size: 12px; }
+.contact-panel-copy > p { font-size: 14px; }
+.contact-email { font-size: 13px; }
+.contact-boundary { font-size: 11px; }
+.contact-form label { font-size: 12px; }
+.contact-form input, .contact-form textarea { font-size: 14px; }
+.contact-success { font-size: 12px; }
+.contact-success strong { font-size: 13px; }
+
+@media (max-width: 600px) {
+  .site-nav a { font-size: 13px; }
+  .hero-intro, .content p, .seo-section-copy p { font-size: 15px; }
+  .section-head p, .tutorial-visual-intro p, .blog-card-heading p, .contact-panel-copy > p { font-size: 14px; }
+  .seo-section-copy h2 { font-size: 37px; }
+  .section-head h3 { font-size: 37px; }
+}
