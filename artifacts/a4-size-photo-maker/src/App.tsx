@@ -380,13 +380,40 @@ function ContactForm() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [draftText, setDraftText] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const sendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
     const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setDraftText(`To: ${CONTACT_EMAIL}\nSubject: ${subject}\n\n${body}`);
     setSubmitted(true);
-    window.location.href = mailto;
+    setCopied(false);
+    const mailWindow = window.open(mailto, '_blank', 'noopener,noreferrer');
+    if (!mailWindow) {
+      window.location.href = mailto;
+    }
+  };
+
+  const copyDraft = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(draftText);
+      } else {
+        const helper = document.createElement('textarea');
+        helper.value = draftText;
+        helper.style.position = 'fixed';
+        helper.style.opacity = '0';
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand('copy');
+        helper.remove();
+      }
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
   };
 
   return (
@@ -408,7 +435,15 @@ function ContactForm() {
         <label htmlFor="contact-message">Message</label>
         <textarea id="contact-message" value={message} onChange={(event) => setMessage(event.target.value)} rows={5} placeholder="Tell us what happened and which page or step you were using." required />
         <button className="button button-primary button-wide" type="submit"><span>Open email draft</span> <span>→</span></button>
-        {submitted && <p className="contact-success" role="status">Your email draft should be open. Review it before sending.</p>}
+        {submitted && (
+          <div className="contact-success" role="status">
+            <strong>Your email draft is ready.</strong>
+            <span>If your device did not open an email app, copy the draft below and send it from your preferred provider.</span>
+            <button className="button button-line contact-copy-button" type="button" onClick={copyDraft}>
+              {copied ? 'Draft copied' : 'Copy email draft'}
+            </button>
+          </div>
+        )}
       </form>
     </section>
   );

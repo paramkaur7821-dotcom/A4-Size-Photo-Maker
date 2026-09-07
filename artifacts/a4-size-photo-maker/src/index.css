@@ -448,7 +448,10 @@ input[type="range"] { display: block; width: 100%; accent-color: hsl(var(--prima
 .contact-form input:focus, .contact-form textarea:focus { border-color: hsl(var(--primary)); box-shadow: 0 0 0 2px hsl(var(--ring) / .14); }
 .contact-form label:nth-of-type(3), .contact-form input:nth-of-type(3), .contact-form label:nth-of-type(4), .contact-form textarea, .contact-form button, .contact-success { grid-column: 1 / -1; }
 .contact-form button { margin-top: 5px; }
-.contact-success { margin: 0; color: hsl(var(--primary)); font-size: 11px; line-height: 1.5; }
+.contact-success { display: grid; gap: 8px; margin: 0; padding: 12px; border: 1px solid hsl(var(--primary) / .22); background: hsl(174 37% 94%); color: hsl(var(--primary)); font-size: 11px; line-height: 1.5; }
+.contact-success strong { font-size: 12px; }
+.contact-success > span { color: hsl(var(--muted-foreground)); }
+.contact-copy-button { width: max-content; min-height: 34px; }
 @media (max-width: 900px) {
   .site-header-inner { flex-wrap: wrap; padding: 14px 0; }
   .site-nav { flex: 0 0 100%; width: 100%; justify-content: flex-start; gap: 18px; margin-left: 0; overflow-x: auto; }
