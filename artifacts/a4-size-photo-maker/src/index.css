@@ -185,12 +185,23 @@ h1 em { color: hsl(var(--primary)); }
   animation: card-rise .7s cubic-bezier(.22, 1, .36, 1) both;
   transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease;
 }
+.tip, .faq-item, .tutorial-faq-item, .step, .download-sheet, .tutorial-screen, .mini-a4, .upload-zone, .preset, .seo-related-links a {
+  animation: card-rise .62s cubic-bezier(.22, 1, .36, 1) both;
+  transition: transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+}
 .panel:hover, .seo-hero-card:hover, .tutorial-step-card:hover, .contact-form:hover, .contact-boundary:hover, .mistake:hover, .metric:hover, .guide-card:hover, .money-note:hover {
   transform: translateY(-4px);
   border-color: hsl(var(--primary) / .48);
   box-shadow: 0 18px 38px rgba(54, 53, 38, .1);
 }
+.tip:hover, .faq-item:hover, .tutorial-faq-item:hover, .step:hover, .download-sheet:hover, .tutorial-screen:hover, .mini-a4:hover, .upload-zone:hover, .preset:hover, .seo-related-links a:hover {
+  transform: translateY(-3px);
+  border-color: hsl(var(--primary) / .48);
+  box-shadow: 0 12px 26px rgba(54, 53, 38, .08);
+}
 .blog-card:hover { transform: translateY(-7px); }
+.tutorial-step-card:nth-child(2), .blog-card:nth-child(2), .mistake:nth-child(2), .metric:nth-child(2) { animation-delay: .08s; }
+.tutorial-step-card:nth-child(3), .blog-card:nth-child(3), .mistake:nth-child(3) { animation-delay: .16s; }
 @keyframes card-rise {
   from { opacity: 0; transform: translateY(18px) scale(.985); }
   to { opacity: 1; transform: translateY(0) scale(1); }
