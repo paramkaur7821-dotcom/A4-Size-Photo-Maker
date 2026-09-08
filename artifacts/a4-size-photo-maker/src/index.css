@@ -595,3 +595,35 @@ body { font-size: 15px; }
   .seo-section-copy h2 { font-size: 37px; }
   .section-head h3 { font-size: 37px; }
 }
+
+/* Final readability pass: stronger text weight and slightly larger copy site-wide. */
+body { font-size: 16px; font-weight: 600; }
+p, li, a, button, input, select, textarea, label, summary, td, th, span, small {
+  font-weight: 600;
+}
+h1, h2, h3, h4, h5, h6, strong {
+  font-weight: 700 !important;
+}
+.hero-intro, .content p, .seo-section-copy p, .tutorial-visual-intro p,
+.blog-card-heading p, .blog-card p, .contact-panel-copy > p,
+.tutorial-faq-item p, .faq-answer {
+  font-size: 16px;
+}
+.site-nav a { font-size: 16px; font-weight: 800; }
+.button { font-size: 14px; font-weight: 800; }
+.section-kicker, .eyebrow, .header-note { font-weight: 700; }
+.panel-label, .control-heading label, .contact-form label { font-weight: 800; }
+.blog-card h3, .section-head h3, .seo-section-copy h2,
+.seo-related h2, .tutorial-faq .section-head h2, .blog-card-heading h2 {
+  font-weight: 700 !important;
+}
+
+@media (max-width: 600px) {
+  body { font-size: 15px; }
+  .hero-intro, .content p, .seo-section-copy p, .tutorial-visual-intro p,
+  .blog-card-heading p, .blog-card p, .contact-panel-copy > p,
+  .tutorial-faq-item p, .faq-answer {
+    font-size: 15px;
+  }
+  .site-nav a { font-size: 13px; }
+}
