@@ -545,7 +545,6 @@ function ContentPage({ page }: { page: SEOPage }) {
         </section>
 
         {page.path === '/how-it-works' && <TutorialVisualGuide />}
-        {page.path === '/blog' && <PhotoGuideCards />}
         {page.path === '/blog' && <BlogCards />}
         {page.path === '/contact-us' && <ContactForm />}
 
@@ -598,6 +597,7 @@ function ContentPage({ page }: { page: SEOPage }) {
             <a href="/terms-of-use">Terms of Use <span>→</span></a>
           </div>
         </section>
+        <PhotoGuideCards />
       </main>
       <div className="main-wrap"><SiteFooter /></div>
     </div>
@@ -867,8 +867,6 @@ function Home() {
           </div>
         </section>
 
-        <PhotoGuideCards />
-
         <section id="guide" className="content" aria-label="A4 photo printing guide">
           <div className="content-intro">
             <div>
@@ -980,6 +978,7 @@ function Home() {
           </div>
         </section>
 
+        <PhotoGuideCards />
         <SiteFooter />
       </main>
     </div>
