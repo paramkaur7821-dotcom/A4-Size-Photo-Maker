@@ -374,6 +374,62 @@ function BlogCards() {
   );
 }
 
+const PHOTO_GUIDES = [
+  {
+    title: 'Passport photo sheet',
+    description: 'Create measured 35 × 45 mm passport photos and print them on one A4 sheet.',
+    image: 'passport-photo-sheet.svg',
+    alt: 'A4 sheet with 35 by 45 millimetre passport photos',
+    path: '/passport-photo-size-maker',
+  },
+  {
+    title: 'PAN Card photo sheet',
+    description: 'Arrange 25 × 35 mm PAN Card photos with a clean cutting gap for printing.',
+    image: 'pan-card-photo-sheet.svg',
+    alt: 'A4 sheet with 25 by 35 millimetre PAN Card photos',
+    path: '/pan-card-photo-maker',
+  },
+  {
+    title: 'Voter ID photo sheet',
+    description: 'Prepare a practical Voter ID photo layout before you visit a print shop.',
+    image: 'voter-id-photo-sheet.svg',
+    alt: 'Voter ID photos arranged on a measured A4 print sheet',
+    path: '/voter-id-photo-maker',
+  },
+];
+
+function PhotoGuideCards() {
+  return (
+    <section className="photo-guide-section" aria-labelledby="photo-guide-title">
+      <div className="photo-guide-heading">
+        <div>
+          <div className="section-kicker">Choose a document</div>
+          <h2 id="photo-guide-title">The right size.<br /><em>The cleaner sheet.</em></h2>
+        </div>
+        <p>Start with the document you are preparing. Each visual guide shows the kind of measured photo sheet you can create with FitMyPhotoA4.</p>
+      </div>
+      <div className="photo-guide-grid">
+        {PHOTO_GUIDES.map((guide, index) => (
+          <a className="photo-guide-card" href={guide.path} key={guide.path}>
+            <img
+              src={`${import.meta.env.BASE_URL}${guide.image}`}
+              alt={guide.alt}
+              loading="lazy"
+              decoding="async"
+            />
+            <div className="photo-guide-card-copy">
+              <span className="photo-guide-number">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{guide.title}</h3>
+              <p>{guide.description}</p>
+              <span className="photo-guide-link">Open guide <span>→</span></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ContactForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -489,6 +545,7 @@ function ContentPage({ page }: { page: SEOPage }) {
         </section>
 
         {page.path === '/how-it-works' && <TutorialVisualGuide />}
+        {page.path === '/blog' && <PhotoGuideCards />}
         {page.path === '/blog' && <BlogCards />}
         {page.path === '/contact-us' && <ContactForm />}
 
@@ -809,6 +866,8 @@ function Home() {
             <div className="privacy-line"><LockKeyhole size={13} /> Everything happens locally. Nothing is sent or stored.</div>
           </div>
         </section>
+
+        <PhotoGuideCards />
 
         <section id="guide" className="content" aria-label="A4 photo printing guide">
           <div className="content-intro">
