@@ -1,0 +1,10 @@
+{
+  "buildCommand": "pnpm --filter @workspace/a4-size-photo-maker run build",
+  "outputDirectory": "artifacts/a4-size-photo-maker/dist/public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

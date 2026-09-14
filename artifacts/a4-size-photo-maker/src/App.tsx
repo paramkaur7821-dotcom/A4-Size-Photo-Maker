@@ -231,7 +231,7 @@ function setPropertyMeta(property: string, content: string) {
 }
 
 function SiteHeader({ currentPath }: { currentPath: string }) {
-  const homeLink = currentPath === '/' ? '#top' : '/';
+  const homeLink = currentPath === '/' ? '#main-content' : '/';
   const toolLink = currentPath === '/' ? '#tool' : '/#tool';
   const guideLink = '/how-it-works';
   const navClass = (path: string) => {
@@ -524,8 +524,9 @@ function ContentPage({ page }: { page: SEOPage }) {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <SiteHeader currentPath={page.path} />
-      <main className="main-wrap seo-page">
+      <main id="main-content" className="main-wrap seo-page">
         <section className="seo-hero" aria-labelledby="seo-page-title">
           <div className="seo-hero-copy">
             <div className="eyebrow">{page.eyebrow}</div>
@@ -597,7 +598,7 @@ function ContentPage({ page }: { page: SEOPage }) {
             <a href="/terms-of-use">Terms of Use <span>→</span></a>
           </div>
         </section>
-        <PhotoGuideCards />
+        {!['/contact-us', '/about-us', '/faq'].includes(page.path) && <PhotoGuideCards />}
       </main>
       <div className="main-wrap"><SiteFooter /></div>
     </div>
@@ -758,15 +759,65 @@ function Home() {
     pdf.save(`a4-photo-sheet-${photoWidth}x${photoHeight}mm.pdf`);
   };
 
+  const printSheet = () => {
+    if (!image || !image.complete || image.naturalWidth === 0) {
+      setFileError('Please wait for the photo to finish loading, then try printing again.');
+      return;
+    }
+    const exportCanvas = document.createElement('canvas');
+    const exportScale = (hdQuality ? HD_DPI : STANDARD_DPI) / 25.4;
+    const copies = drawSheet(exportCanvas, image, photoWidth, photoHeight, spacing, exportScale, blackAndWhite);
+    if (copies === 0) {
+      setFileError('This photo size is too large to fit on an A4 sheet.');
+      return;
+    }
+    const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.95);
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      setFileError('Please allow pop-ups in your browser so the print window can open.');
+      return;
+    }
+    printWin.document.write(`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Print A4 photo sheet</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #ffffff; }
+  body { display: grid; place-items: center; min-height: 100vh; }
+  .note { position: fixed; top: 10px; left: 12px; right: 12px; z-index: 10; padding: 10px 14px; background: #f0f4f2; border: 1px solid #b6d2ce; color: #1f353d; font: 500 13px/1.5 'Segoe UI', system-ui, sans-serif; }
+  img { width: 210mm; height: 297mm; display: block; }
+  @media print { .note { display: none !important; } }
+</style>
+</head>
+<body>
+  <div class="note">In the print dialog choose A4 paper, portrait orientation, and Scale 100% / Actual size. Turn off “Fit to page”.</div>
+  <img src="${dataUrl}" alt="A4 photo sheet of ${photoWidth} x ${photoHeight} mm photos" />
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () { window.focus(); window.print(); }, 250);
+    });
+    window.addEventListener('afterprint', function () {
+      setTimeout(function () { window.close(); }, 200);
+    });
+  <\/script>
+</body>
+</html>`);
+    printWin.document.close();
+  };
+
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <SiteHeader currentPath="/" />
 
-      <main id="top" className="main-wrap">
+      <main id="main-content" className="main-wrap">
         <section className="hero" aria-labelledby="page-title">
           <div>
             <div className="eyebrow">Exact sizes · less waste</div>
-            <h1 id="page-title">Professional sheets.<br /><em>Perfectly measured.</em></h1>
+            <h1 id="page-title">Professional A4 photo sheets.<br /><em>Perfectly measured.</em></h1>
             <p className="hero-intro">
               Turn one photo into a precisely measured A4 print sheet for passports, visas, and ID cards. Set the size, leave a sensible cutting gap, and take the file to any affordable printer.
             </p>
@@ -860,6 +911,7 @@ function Home() {
               <div className="fit-count" data-testid="status-fit-count"><strong>{fitCount}</strong><span>photos fit on this A4 sheet ({columns} × {rows})</span></div>
               <div className="download-actions">
                 <button className="button button-quiet" type="button" onClick={() => exportSheet('png')} disabled={!image} data-testid="button-download-png"><Download size={14} /> PNG</button>
+                <button className="button button-line" type="button" onClick={printSheet} disabled={!image} data-testid="button-print"><Printer size={14} /> Print</button>
                 <button className="button button-primary" type="button" onClick={() => exportSheet('pdf')} disabled={!image} data-testid="button-download-pdf"><FileDown size={14} /> Download PDF</button>
               </div>
             </div>

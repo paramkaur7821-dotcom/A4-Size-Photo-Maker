@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://a4-size-photo-maker.replit.app/sitemap.xml

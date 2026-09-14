@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: fitmyphotoa4-api
+    runtime: node
+    rootDir: .
+    plan: free
+    healthCheckPath: /api/healthz
+    buildCommand: pnpm --filter @workspace/api-server run build
+    startCommand: pnpm --filter @workspace/api-server run start
+    envVars:
+      - key: NODE_ENV
+        value: production
