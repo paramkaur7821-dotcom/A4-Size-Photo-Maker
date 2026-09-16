@@ -1,12 +1,15 @@
 services:
   - type: web
-    name: fitmyphotoa4-api
-    runtime: node
-    rootDir: .
-    plan: free
-    healthCheckPath: /api/healthz
-    buildCommand: pnpm --filter @workspace/api-server run build
-    startCommand: pnpm --filter @workspace/api-server run start
+    name: a4-size-photo-maker
+    runtime: static
+    buildCommand: pnpm --filter @workspace/a4-size-photo-maker run build
+    staticPublishPath: artifacts/a4-size-photo-maker/dist/public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: NODE_ENV
-        value: production
+      - key: PORT
+        value: "20742"
+      - key: BASE_PATH
+        value: /
