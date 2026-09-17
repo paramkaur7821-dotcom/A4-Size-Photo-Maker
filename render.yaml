@@ -2,8 +2,8 @@ services:
   - type: web
     name: a4-size-photo-maker
     runtime: static
-    buildCommand: pnpm --filter @workspace/a4-size-photo-maker run build
-    staticPublishPath: artifacts/a4-size-photo-maker/dist/public
+    buildCommand: echo ready
+    staticPublishPath: render-static
     routes:
       - type: rewrite
         source: /*
