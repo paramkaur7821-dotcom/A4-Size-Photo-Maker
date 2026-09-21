@@ -401,6 +401,12 @@ input[type="range"] { display: block; width: 100%; accent-color: hsl(var(--prima
 .city-fact:last-child { border-right: none; }
 .city-fact span { display: block; color: hsl(var(--muted-foreground)); font: 10px var(--app-font-mono); letter-spacing: .1em; text-transform: uppercase; }
 .city-fact strong { display: block; margin-top: 7px; font-size: 14px; line-height: 1.4; color: var(--city-accent); }
+.city-keywords { padding: 28px 0; border-bottom: 1px solid hsl(var(--border)); }
+.city-keywords h2 { margin: 0 0 14px; color: hsl(var(--muted-foreground)); font: 10px var(--app-font-mono); letter-spacing: .1em; text-transform: uppercase; }
+.city-keywords ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.city-keywords li { padding: 7px 12px; border: 1px solid hsl(var(--border)); border-radius: 999px; background: hsl(var(--card)); color: hsl(var(--foreground)); font-size: 11px; line-height: 1.4; }
+.city-tip-card { border-style: dashed; border-color: var(--city-accent); }
+.city-tip-card p { margin: 0; color: hsl(var(--muted-foreground)); font-size: 12px; line-height: 1.7; }
 .city-body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 70px; padding: 0 0 30px; }
 .city-article { border-top: none; }
 .city-aside { padding: 44px 0 0; }

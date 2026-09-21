@@ -675,7 +675,7 @@ function CityPage({ city }: { city: CityInfo }) {
           <div className="city-hero-copy">
             <div className="eyebrow">Local photo sheets · {city.name} ({city.district})</div>
             <h1 id="city-page-title">{city.heroTitle}</h1>
-            <p className="hero-intro">{city.metaDescription}</p>
+            <p className="hero-intro">{city.intro}</p>
             <div className="seo-hero-actions">
               <a className="button button-primary" href="/#tool">Open the photo maker</a>
               <a className="button button-line" href="#local-faq">Read {city.name} questions</a>
@@ -696,25 +696,24 @@ function CityPage({ city }: { city: CityInfo }) {
           <div className="city-fact"><span>Print-size presets</span><strong>35×45 · 25×35 · 20×25 mm</strong></div>
         </section>
 
+        <nav className="city-keywords" aria-label={`Popular photo searches in ${city.name}`}>
+          <h2>{city.name}, {city.district} — photo sheet searches</h2>
+          <ul>
+            {city.keywords.map((kw) => <li key={kw}>{kw}</li>)}
+          </ul>
+        </nav>
+
         <div className="city-body">
           <article className="seo-article city-article">
-            {city.aboutCounty.map((paragraph, index) => (
-              <section className="seo-section" key={`pf:${index}`}>
+            {city.sections.map((section, index) => (
+              <section className="seo-section" key={section.heading}>
                 <div className="seo-section-index">{String(index + 1).padStart(2, '0')}</div>
                 <div className="seo-section-copy">
-                  <h2>{index === 0 ? `About ${city.name} & its photo needs` : `How people in ${city.name} use this page`}</h2>
-                  <p>{paragraph}</p>
+                  <h2>{section.heading}</h2>
+                  {section.paragraphs.map((paragraph) => <p key={paragraph} dangerouslySetInnerHTML={{ __html: paragraph }} />)}
                 </div>
               </section>
             ))}
-            <section className="seo-section">
-              <div className="seo-section-index">{String(city.aboutCounty.length + 1).padStart(2, '0')}</div>
-              <div className="seo-section-copy">
-                <h2>How to make your {city.name} photo sheet</h2>
-                <p>Select a preset — Passport (35×45), PAN Card (25×35), Voter ID (25×35) or Stamp (20×25) — or enter a Custom millimetre size if a form specifies its own. Upload a clear, well-lit photo; crop to position the face with a little headroom; choose a light background and, when needed, the black-and-white option.</p>
-                <p>The sheet previews the real A4 dimensions with margins and a gap for cutting. Download as PNG or PDF, then take it to any print shop in {city.name} and ask for A4, portrait, <em>Actual size (100%)</em> so the millimetres stay exact.</p>
-              </div>
-            </section>
           </article>
 
           <aside className="city-aside" aria-label={`Local context for ${city.name}`}>
@@ -733,6 +732,11 @@ function CityPage({ city }: { city: CityInfo }) {
                 <li><strong>25 × 35 mm</strong><span>PAN Card, Voter ID, licences</span></li>
                 <li><strong>20 × 25 mm</strong><span>Stamp size, school admissions</span></li>
               </ul>
+            </div>
+            <div className="city-place-card city-tip-card">
+              <span className="section-kicker">Print counter tip</span>
+              <h3>Walk in ready</h3>
+              <p>{city.localTip}</p>
             </div>
           </aside>
         </div>
