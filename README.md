@@ -2,6 +2,15 @@
 
 Passport, stamp aur custom size photos ko ek A4 sheet par perfectly arrange karne wala web tool — taki aap ghar ya kisi bhi photo studio se ek hi print me kai copies nikal sakein.
 
+## 🌐 Live Demo
+
+App ab dono platforms par **live** hai:
+
+- **Vercel:** https://a4-size-photo-maker.vercel.app
+- **Render:** https://a4-size-photo-maker.onrender.com
+
+Dono URLs pe saari pages (About, Blog, Passport/ PAN/ Voter ID Photo Maker, FAQ, Contact, Privacy Policy, Terms) chal rahi hain.
+
 ## ✨ Features
 
 - **Multiple photo sizes** — Passport (35×45mm), Stamp (20×25mm), Visa (51×51mm) aur custom dimensions
@@ -52,7 +61,7 @@ pnpm start
 |-------|-----------|
 | Language | TypeScript |
 | Package Manager | pnpm |
-| Deployment | Render |
+| Deployment | Vercel + Render |
 | Dev Environment | Replit |
 
 ## 📖 How to Use
