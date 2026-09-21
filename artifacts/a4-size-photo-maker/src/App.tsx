@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   Check,
   ChevronDown,
@@ -15,6 +15,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { ALL_SEO_PAGES, type SEOPage } from './seoContent';
+import { CITY_PAGES, CITY_LINKS, type CityInfo } from './cityContent';
 import {
   ABOUT_PAGE,
   BLOG_ARTICLE_PAGES,
@@ -282,6 +283,16 @@ function SiteFooter() {
         <a href="/contact-us">Contact</a>
         <a href="/privacy-policy">Privacy</a>
         <a href="/terms-of-use">Terms</a>
+      </span>
+      <span className="footer-cities" aria-label="Local SEO pages">
+        <a href={CITY_LINKS[0].path}>{CITY_LINKS[0].name}</a>
+        <a href={CITY_LINKS[1].path}>{CITY_LINKS[1].name}</a>
+        <a href={CITY_LINKS[2].path}>{CITY_LINKS[2].name}</a>
+        <a href={CITY_LINKS[3].path}>{CITY_LINKS[3].name}</a>
+        <a href={CITY_LINKS[4].path}>{CITY_LINKS[4].name}</a>
+        <a href={CITY_LINKS[5].path}>{CITY_LINKS[5].name}</a>
+        <a href={CITY_LINKS[6].path}>{CITY_LINKS[6].name}</a>
+        <a href={CITY_LINKS[7].path}>{CITY_LINKS[7].name}</a>
       </span>
     </footer>
   );
@@ -599,6 +610,163 @@ function ContentPage({ page }: { page: SEOPage }) {
           </div>
         </section>
         {!['/contact-us', '/about-us', '/faq'].includes(page.path) && <PhotoGuideCards />}
+      </main>
+      <div className="main-wrap"><SiteFooter /></div>
+    </div>
+  );
+}
+
+function CityPage({ city }: { city: CityInfo }) {
+  useEffect(() => {
+    document.title = city.metaTitle;
+    setMeta('description', city.metaDescription);
+    setPropertyMeta('og:title', city.metaTitle);
+    setPropertyMeta('og:description', city.metaDescription);
+    setMeta('twitter:title', city.metaTitle);
+    setMeta('twitter:description', city.metaDescription);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', new URL(city.path, window.location.origin).toString());
+    const jsonLd = [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: city.faqItems.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: window.location.origin },
+          { '@type': 'ListItem', position: 2, name: `${city.name}, ${city.district}`, item: new URL(city.path, window.location.origin).toString() },
+        ],
+      },
+    ];
+    let script = document.querySelector('script[data-city-schema]');
+    if (!script) {
+      script = document.createElement('script');
+      script.setAttribute('type', 'application/ld+json');
+      script.setAttribute('data-city-schema', 'true');
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(jsonLd);
+  }, [city]);
+
+  return (
+    <div className="app-shell">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
+      <SiteHeader currentPath={city.path} />
+      <main id="main-content" className="main-wrap city-page" data-variant={city.variant} style={{ '--city-accent': city.accent } as CSSProperties}>
+        <nav className="city-breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span aria-hidden="true">›</span>
+          <a href="/how-it-works">Tools</a><span aria-hidden="true">›</span>
+          <span>{city.name}, {city.district}</span>
+        </nav>
+
+        <section className="city-hero" aria-labelledby="city-page-title">
+          <div className="city-hero-copy">
+            <div className="eyebrow">Local photo sheets · {city.name} ({city.district})</div>
+            <h1 id="city-page-title">{city.heroTitle}</h1>
+            <p className="hero-intro">{city.metaDescription}</p>
+            <div className="seo-hero-actions">
+              <a className="button button-primary" href="/#tool">Open the photo maker</a>
+              <a className="button button-line" href="#local-faq">Read {city.name} questions</a>
+            </div>
+          </div>
+          <div className="city-hero-card" style={{ background: `linear-gradient(135deg, ${city.accent}, ${city.accent}cc)` }}>
+            <span className="section-kicker">FitMyPhotoA4 · {city.name}</span>
+            <strong>Print an A4 sheet.<br />Nearest shop in mind.</strong>
+            <p>Passport 35×45 · PAN 25×35 · Voter 25×35 · Stamp 20×25 mm, all on one printable A4 layout.</p>
+            <span className="seo-hero-card-mark">210 × 297 mm</span>
+          </div>
+        </section>
+
+        <section className="city-facts" aria-label={`Quick facts about ${city.name}`}>
+          <div className="city-fact"><span>District</span><strong>{city.district} (Haryana)</strong></div>
+          <div className="city-fact"><span>RTO codes</span><strong>{city.rtoCodes}</strong></div>
+          <div className="city-fact"><span>Pincode</span><strong>{city.pincode}</strong></div>
+          <div className="city-fact"><span>Print-size presets</span><strong>35×45 · 25×35 · 20×25 mm</strong></div>
+        </section>
+
+        <div className="city-body">
+          <article className="seo-article city-article">
+            {city.aboutCounty.map((paragraph, index) => (
+              <section className="seo-section" key={`pf:${index}`}>
+                <div className="seo-section-index">{String(index + 1).padStart(2, '0')}</div>
+                <div className="seo-section-copy">
+                  <h2>{index === 0 ? `About ${city.name} & its photo needs` : `How people in ${city.name} use this page`}</h2>
+                  <p>{paragraph}</p>
+                </div>
+              </section>
+            ))}
+            <section className="seo-section">
+              <div className="seo-section-index">{String(city.aboutCounty.length + 1).padStart(2, '0')}</div>
+              <div className="seo-section-copy">
+                <h2>How to make your {city.name} photo sheet</h2>
+                <p>Select a preset — Passport (35×45), PAN Card (25×35), Voter ID (25×35) or Stamp (20×25) — or enter a Custom millimetre size if a form specifies its own. Upload a clear, well-lit photo; crop to position the face with a little headroom; choose a light background and, when needed, the black-and-white option.</p>
+                <p>The sheet previews the real A4 dimensions with margins and a gap for cutting. Download as PNG or PDF, then take it to any print shop in {city.name} and ask for A4, portrait, <em>Actual size (100%)</em> so the millimetres stay exact.</p>
+              </div>
+            </section>
+          </article>
+
+          <aside className="city-aside" aria-label={`Local context for ${city.name}`}>
+            <div className="city-place-card">
+              <span className="section-kicker">Around {city.name}</span>
+              <h3>Landmarks & markets</h3>
+              <ul className="city-places">
+                {city.famousPlaces.map((place) => <li key={place}>{place}</li>)}
+              </ul>
+            </div>
+            <div className="city-place-card">
+              <span className="section-kicker">Print-first sizes</span>
+              <h3>Size → typical use</h3>
+              <ul className="city-sizes">
+                <li><strong>35 × 45 mm</strong><span>Passport, office ID, exam forms</span></li>
+                <li><strong>25 × 35 mm</strong><span>PAN Card, Voter ID, licences</span></li>
+                <li><strong>20 × 25 mm</strong><span>Stamp size, school admissions</span></li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+
+        <section className="tutorial-faq city-faq" id="local-faq" aria-labelledby="local-faq-title">
+          <div className="section-head">
+            <div>
+              <div className="section-kicker">{city.name} FAQ</div>
+              <h2 id="local-faq-title">{city.name} photo<br /><em>questions, answered.</em></h2>
+            </div>
+            <p>Local answers about print shops, sizes and passport centres near {city.name}, {city.district}.</p>
+          </div>
+          <div className="faq-list">
+            {city.faqItems.map((faq, index) => (
+              <details className="tutorial-faq-item" key={faq.question} open={index === 0}>
+                <summary><span>{String(index + 1).padStart(2, '0')} · {faq.question}</span><ChevronDown size={15} /></summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="city-neighbors" aria-label={`Nearby cities to ${city.name}`}>
+          <div>
+            <div className="section-kicker">Nearby in Haryana</div>
+            <h2>Also serving <em>{city.name} &amp; neighbours.</em></h2>
+          </div>
+          <div className="seo-related-links">
+            {city.nearbyCities.map((near) => (
+              <a key={near.path} href={near.path}>{near.name} photo sheets <span>→</span></a>
+            ))}
+            <a href="/#tool">Open the maker <span>→</span></a>
+          </div>
+        </section>
       </main>
       <div className="main-wrap"><SiteFooter /></div>
     </div>
@@ -1053,7 +1221,9 @@ function App() {
   }, []);
 
   const page = APP_PAGES[currentPath];
-  return page ? <ContentPage page={page} /> : <Home />;
+  if (page) return <ContentPage page={page} />;
+  const city = CITY_PAGES[currentPath];
+  return city ? <CityPage city={city} /> : <Home />;
 }
 
 export default App;
