@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" role="img" aria-labelledby="title desc">
+  <title id="title">PAN Card photo sheet illustration</title>
+  <desc id="desc">A clean A4 sheet showing repeated PAN Card photo spaces.</desc>
+  <defs>
+    <linearGradient id="pan-bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#355b5d"/>
+      <stop offset="1" stop-color="#173c43"/>
+    </linearGradient>
+    <linearGradient id="pan-photo" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#efbf9e"/>
+      <stop offset=".5" stop-color="#e48e7e"/>
+      <stop offset="1" stop-color="#477a80"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="540" rx="20" fill="url(#pan-bg)"/>
+  <text x="54" y="62" fill="#f4b38f" font-family="monospace" font-size="18" letter-spacing="4">PAN CARD / A4 · 25 × 35 MM</text>
+  <rect x="252" y="54" width="350" height="438" rx="4" fill="#fbfaf5"/>
+  <rect x="274" y="76" width="306" height="394" fill="none" stroke="#bec8c5" stroke-dasharray="5 7"/>
+  <g fill="url(#pan-photo)" stroke="#f4b38f" stroke-width="3">
+    <rect x="294" y="102" width="72" height="101" rx="2"/><rect x="382" y="102" width="72" height="101" rx="2"/><rect x="470" y="102" width="72" height="101" rx="2"/>
+    <rect x="294" y="223" width="72" height="101" rx="2"/><rect x="382" y="223" width="72" height="101" rx="2"/><rect x="470" y="223" width="72" height="101" rx="2"/>
+    <rect x="294" y="344" width="72" height="101" rx="2"/><rect x="382" y="344" width="72" height="101" rx="2"/><rect x="470" y="344" width="72" height="101" rx="2"/>
+  </g>
+  <text x="660" y="258" fill="#f8faf7" font-family="sans-serif" font-size="25" font-weight="700">Measured copies</text>
+  <text x="660" y="296" fill="#b6d2ce" font-family="monospace" font-size="18">25 × 35 mm</text>
+  <circle cx="672" cy="356" r="7" fill="#f4b38f"/>
+  <text x="694" y="364" fill="#b6d2ce" font-family="monospace" font-size="16">easy cuts</text>
+</svg>
