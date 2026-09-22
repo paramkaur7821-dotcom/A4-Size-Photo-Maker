@@ -17,7 +17,7 @@ export type CityInfo = {
   pincode: string;
   famousPlaces: string[];
   accent: string;
-  variant: 1 | 2 | 3;
+  variant: 1 | 2 | 3 | 4 | 5;
   heroTitle: string;
   metaTitle: string;
   metaDescription: string;
@@ -280,7 +280,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     pincode: '132103',
     famousPlaces: ['Panipat textile & carpet market', 'Battle of Panipat memorial sites', 'Panipat Junction Railway Station', 'NH-44 corridor'],
     accent: '#f76707',
-    variant: 1,
+    variant: 4,
     heroTitle: 'Panipat Passport & ID Photo Sheets — Print Near the Textile Market',
     metaTitle: 'Passport Photo in Panipat | Free A4 ID Photo Sheet Maker (35×45 mm)',
     metaDescription:
@@ -359,7 +359,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     pincode: '136118',
     famousPlaces: ['Brahma Sarovar', 'Sannihit Sarovar', 'Jyotisar (birthplace of the Bhagavad Gita)', 'Kurukshetra Panorama & Science Centre'],
     accent: '#e03131',
-    variant: 2,
+    variant: 5,
     heroTitle: 'Passport Photo Kurukshetra & Thanesar — A4 Sheet for Yatra & Office',
     metaTitle: 'Passport Photo Kurukshetra | A4 ID Photo Sheet Maker (Thanesar HR-07)',
     metaDescription:
@@ -437,7 +437,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     pincode: '126116',
     famousPlaces: ['Narwana Junction Railway Station', 'Gur (jaggery) mandi', 'Jind–Kaithal highway corridor'],
     accent: '#f08c00',
-    variant: 3,
+    variant: 1,
     heroTitle: 'Passport Photo Sheets for Narwana — Jind District, Print at the Mandi',
     metaTitle: 'Passport Photo in Narwana | Free A4 Sheet Maker — Jind District HR-32',
     metaDescription:
@@ -516,7 +516,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     pincode: '136128',
     famousPlaces: ['Saraswati-bank pilgrimage ghats', 'Pehowa temple complex', 'Pehowa Railway Station'],
     accent: '#6741d9',
-    variant: 1,
+    variant: 2,
     heroTitle: 'Pehowa Passport & Yatra Photo Sheets — Print Near the Temple Complex',
     metaTitle: 'Passport Photo in Pehowa | A4 Sheet Maker — Kurukshetra District HR-41',
     metaDescription:
@@ -672,7 +672,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     pincode: '125001',
     famousPlaces: ['CCS Haryana Agricultural University (Hau)', 'Hisar Deer Park', 'Agrasen Ki Baoli', 'Hisar Junction Railway Station'],
     accent: '#15aabf',
-    variant: 2,
+    variant: 4,
     heroTitle: 'Hisar Passport & ID Photo Sheets — Hau to the Mini Secretariat',
     metaTitle: 'Passport Photo Hisar | A4 ID Photo Sheet Maker (HR-20) — Free',
     metaDescription:
@@ -750,7 +750,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     pincode: '133001',
     famousPlaces: ['Ambala Cantt — city of scientific instruments', 'Ambala Junction Railway Station', 'Civil Lines & mini secretariat area', 'Ordnance & trade-market lanes'],
     accent: '#5f3dc4',
-    variant: 3,
+    variant: 5,
     heroTitle: 'Ambala Passport & ID Photo Sheets — Cantt-City Print at Home',
     metaTitle: 'Passport Photo Ambala | A4 ID Photo Sheet Maker (HR-01) — Free',
     metaDescription:

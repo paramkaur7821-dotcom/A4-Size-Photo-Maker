@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { ALL_SEO_PAGES, type SEOPage } from './seoContent';
 import { CITY_PAGES, CITY_LINKS, CITY_LABELS, type CityInfo } from './cityContent';
+import AdminPanel from './AdminPanel';
+import { loadSettings, loadLabels, bumpVisit } from './adminConfig';
 import {
   ABOUT_PAGE,
   BLOG_ARTICLE_PAGES,
@@ -264,19 +266,29 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
 }
 
 function SiteFooter() {
+  const adminSettings = loadSettings();
+  const adminLabels = loadLabels();
+  const siteName = adminSettings.siteName || 'FitMyPhotoA4';
+  const brandLine = adminSettings.brandLine || 'A quiet tool for the print counter.';
+  const tagline =
+    adminSettings.tagline ||
+    'Measured passport, PAN, voter ID and licence photo sheets built for A4 printing — everything stays in your browser, and you print one sheet at your nearest shop.';
+  const labels = { ...CITY_LABELS, ...adminLabels };
+  const showCities = adminSettings.showCities !== false;
+
   return (
-    <footer className="footer">
+    <footer className="footer" data-hide-cities={showCities ? undefined : true}>
       <div className="footer-main">
         <div className="footer-about">
           <div className="footer-brand">
             <img className="footer-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
             <div>
-              <strong>FitMyPhotoA4</strong>
-              <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
+              <strong>{siteName}</strong>
+              <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> {brandLine}</span>
             </div>
           </div>
           <p className="footer-tagline">
-            Measured passport, PAN, voter ID and licence photo sheets built for A4 printing — everything stays in your browser, and you print one sheet at your nearest shop.
+            {tagline}
           </p>
         </div>
 
@@ -291,16 +303,18 @@ function SiteFooter() {
           </div>
         </nav>
 
+        {showCities && (
         <nav className="footer-col footer-col-cities" aria-label="Haryana local pages">
           <h3>Haryana · local pages</h3>
           <div className="footer-city-links">
             {CITY_LINKS.map((city) => (
               <a key={city.path} href={city.path}>
-                <span className="footer-city-name">{CITY_LABELS[city.path] ?? city.name}</span>
+                <span className="footer-city-name">{labels[city.path] ?? city.name}</span>
               </a>
             ))}
           </div>
         </nav>
+      )}
 
         <nav className="footer-col" aria-label="Company">
           <h3>Company</h3>
@@ -314,14 +328,16 @@ function SiteFooter() {
 
         <nav className="footer-col" aria-label="Legal">
           <h3>Legal</h3>
-          <a href="/privacy-policy">Privacy Policy</a>
-          <a href="/terms-of-use">Terms of Use</a>
+          <div className="footer-legal">
+            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/terms-of-use">Terms of Use</a>
+          </div>
         </nav>
       </div>
 
       <div className="footer-bottom">
-        <span>© 2026 FitMyPhotoA4 · Free photo sheets, no signup, no upload.</span>
-        <span>Print counters in Haryana deserve better than marker-sketched sizes.</span>
+        <span>© 2026 {siteName} · Free photo sheets, no signup, no upload.</span>
+        <span>Print counters in Haryana deserve better than marker-sketched sizes. <a href="/admin">Admin</a></span>
       </div>
     </footer>
   );
@@ -1245,6 +1261,7 @@ function App() {
   });
 
   useEffect(() => {
+    bumpVisit();
     const handlePopState = () => {
       const path = window.location.pathname.replace(/\/+$/, '');
       setCurrentPath(path || '/');
@@ -1253,6 +1270,7 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  if (currentPath === '/admin') return <AdminPanel />;
   const page = APP_PAGES[currentPath];
   if (page) return <ContentPage page={page} />;
   const city = CITY_PAGES[currentPath];

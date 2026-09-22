@@ -1,0 +1,104 @@
+const KEY_SETTINGS = 'fmp_admin_settings';
+const KEY_LABELS = 'fmp_admin_city_labels';
+const KEY_DRAFTS = 'fmp_admin_drafts';
+const KEY_SESSION = 'fmp_admin_session';
+const KEY_VISITS = 'fmp_visits';
+
+export const DEFAULT_ADMIN_PASSWORD = 'fitmyphoto2026';
+
+export type AdminSettings = {
+  siteName: string;
+  brandLine: string;
+  tagline: string;
+  contactEmail: string;
+  showCities: boolean;
+  accent: string;
+  password: string;
+};
+
+export type CityLabelDraft = {
+  path: string;
+  label: string;
+};
+
+export type BlogDraft = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  body: string;
+  createdAt: string;
+};
+
+function read<T>(key: string, fallback: T): T {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function write(key: string, value: unknown) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+export function loadSettings(): Partial<AdminSettings> {
+  return read<Partial<AdminSettings>>(KEY_SETTINGS, {});
+}
+
+export function saveSettings(settings: Partial<AdminSettings>) {
+  write(KEY_SETTINGS, settings);
+}
+
+export function loadLabels(): Record<string, string> {
+  return read<Record<string, string>>(KEY_LABELS, {});
+}
+
+export function saveLabel(path: string, label: string) {
+  const labels = loadLabels();
+  labels[path] = label;
+  write(KEY_LABELS, labels);
+}
+
+export function loadDrafts(): BlogDraft[] {
+  return read<BlogDraft[]>(KEY_DRAFTS, []);
+}
+
+export function saveDrafts(drafts: BlogDraft[]) {
+  write(KEY_DRAFTS, drafts);
+}
+
+export function loadPassword(): string {
+  const s = loadSettings();
+  return s.password || DEFAULT_ADMIN_PASSWORD;
+}
+
+export function isAdminLoggedIn(): boolean {
+  return window.localStorage.getItem(KEY_SESSION) === '1';
+}
+
+export function login(password: string): boolean {
+  if (password !== loadPassword()) return false;
+  window.localStorage.setItem(KEY_SESSION, '1');
+  return true;
+}
+
+export function logout() {
+  window.localStorage.removeItem(KEY_SESSION);
+}
+
+export function bumpVisit(): number {
+  const n = Number(window.localStorage.getItem(KEY_VISITS) || '0') + 1;
+  window.localStorage.setItem(KEY_VISITS, String(n));
+  return n;
+}
+
+export function readVisits(): number {
+  return Number(window.localStorage.getItem(KEY_VISITS) || '0');
+}
