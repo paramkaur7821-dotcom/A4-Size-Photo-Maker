@@ -15,7 +15,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { ALL_SEO_PAGES, type SEOPage } from './seoContent';
-import { CITY_PAGES, CITY_LINKS, type CityInfo } from './cityContent';
+import { CITY_PAGES, CITY_LINKS, CITY_TAGLINES, type CityInfo } from './cityContent';
 import {
   ABOUT_PAGE,
   BLOG_ARTICLE_PAGES,
@@ -295,7 +295,10 @@ function SiteFooter() {
           <h3>Haryana · local pages</h3>
           <div className="footer-city-links">
             {CITY_LINKS.map((city) => (
-              <a key={city.path} href={city.path}>{city.name}<span>→</span></a>
+              <a key={city.path} href={city.path}>
+                <span className="footer-city-name">Fit My Photo {city.name}</span>
+                <span className="footer-city-tag">{CITY_TAGLINES[city.path] ?? 'Photo sheets at home'}</span>
+              </a>
             ))}
           </div>
         </nav>

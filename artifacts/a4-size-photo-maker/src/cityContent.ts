@@ -818,3 +818,16 @@ export const CITY_PAGES: Record<string, CityInfo> = {
 };
 
 export const CITY_LINKS = Object.values(CITY_PAGES).map((c) => ({ name: c.name, path: c.path }));
+
+export const CITY_TAGLINES: Record<string, string> = {
+  '/kaithal': 'Bina bazaar jaye photo',
+  '/jind': 'Bina studio, bina queue',
+  '/karnal': 'Rice-belt ke sab sizes',
+  '/panipat': 'Har file ka perfect size',
+  '/kurukshetra': 'Tirth din ki sab sheets',
+  '/narwana': 'Ek A4 me sab kuch',
+  '/pehowa': 'Kumbh se pehle ready',
+  '/cheeka': 'Tehsil kaam me aadha',
+  '/hisar': 'Hau se mandi tak',
+  '/ambala': 'Cantt aur City dono',
+};
