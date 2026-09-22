@@ -118,8 +118,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
       { name: 'Narwana', path: '/narwana' },
       { name: 'Kaithal', path: '/kaithal' },
       { name: 'Panipat', path: '/panipat' },
-      { name: 'Assandh', path: '/karnal' },
-      { name: 'Rohtak', path: '/jind' },
+      { name: 'Hisar', path: '/hisar' },
     ],
     rtoCodes: 'HR-31 / HR-56',
     pincode: '126102',
@@ -198,7 +197,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
       { name: 'Panipat', path: '/panipat' },
       { name: 'Kaithal', path: '/kaithal' },
       { name: 'Kurukshetra', path: '/kurukshetra' },
-      { name: 'Assandh', path: '/karnal' },
+      { name: 'Ambala', path: '/ambala' },
     ],
     rtoCodes: 'HR-05 / HR-45',
     pincode: '132001',
@@ -276,8 +275,6 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     nearbyCities: [
       { name: 'Karnal', path: '/karnal' },
       { name: 'Jind', path: '/jind' },
-      { name: 'Samalkha', path: '/panipat' },
-      { name: 'Sonipat', path: '/panipat' },
     ],
     rtoCodes: 'HR-06 / HR-67',
     pincode: '132103',
@@ -434,9 +431,7 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     nearbyCities: [
       { name: 'Jind', path: '/jind' },
       { name: 'Kaithal', path: '/kaithal' },
-      { name: 'Safidon', path: '/narwana' },
-      { name: 'Barwala', path: '/narwana' },
-      { name: 'Hansi', path: '/narwana' },
+      { name: 'Hisar', path: '/hisar' },
     ],
     rtoCodes: 'HR-32',
     pincode: '126116',
@@ -593,7 +588,6 @@ export const CITY_PAGES: Record<string, CityInfo> = {
     nearbyCities: [
       { name: 'Kaithal', path: '/kaithal' },
       { name: 'Pehowa', path: '/pehowa' },
-      { name: 'Guhla', path: '/kaithal' },
       { name: 'Kurukshetra', path: '/kurukshetra' },
     ],
     rtoCodes: 'HR-08 (SDO Cheeka)',
@@ -662,6 +656,162 @@ export const CITY_PAGES: Record<string, CityInfo> = {
         question: 'Is the tool usable offline in Cheeka?',
         answer:
           'After the page loads, photo processing happens in the browser. Internet is only needed for the initial page load, so the tool remains practical on slow village connections.',
+      },
+    ],
+  },
+'/hisar': {
+    path: '/hisar',
+    name: 'Hisar',
+    district: 'Hisar',
+    nearbyCities: [
+      { name: 'Narwana', path: '/narwana' },
+      { name: 'Jind', path: '/jind' },
+      { name: 'Kaithal', path: '/kaithal' },
+    ],
+    rtoCodes: 'HR-20 / HR-39',
+    pincode: '125001',
+    famousPlaces: ['CCS Haryana Agricultural University (Hau)', 'Hisar Deer Park', 'Agrasen Ki Baoli', 'Hisar Junction Railway Station'],
+    accent: '#15aabf',
+    variant: 2,
+    heroTitle: 'Hisar Passport & ID Photo Sheets — Hau to the Mini Secretariat',
+    metaTitle: 'Passport Photo Hisar | A4 ID Photo Sheet Maker (HR-20) — Free',
+    metaDescription:
+      'Passport photo in Hisar from home — 35×45 mm A4 sheets, PAN 25×35, voter & licence. Print near Hisar bus stand, Delhi Road or mini secretariat. No signup.',
+    intro:
+      'Hisar\'s paperwork engine runs on its university, mandi and industrial belt — Hau students need cards, traders near the grain mandi need KYC prints, and every HR-20 licence file needs fresh photographs. Because the closest passport-seva counters sit in Ambala and Chandigarh, the smart route is a home-made A4 sheet finished at a shop near the bus stand or Delhi Road.',
+    keywords: [
+      'passport photo in Hisar',
+      'photo print near Hisar bus stand',
+      'A4 photo sheet HR-20 Hisar',
+      'PAN photo 25×35 Hisar',
+      'Hau student card photo size',
+      'nearest passport centre from Hisar',
+      'stamp size photo Hisar mandi',
+      'custom size photo sheet mini secretariat',
+    ],
+    sections: [
+      {
+        heading: 'Hisar\'s photo treadmill — Hau, mandi and the RTO desk',
+        paragraphs: [
+          'Chauhan Chowk to the CCS Haryana Agricultural University, the town\'s rhythm never slows: Hau students replace ID photos for hostel cards and exam forms, mandi traders refresh KYC prints for commission agents and banks, and RTO Hisar (HR-20) paperwork for licence and vehicle files asks for fresh photographs on nearly every page.',
+          'Add the journeys people make from there — PSK appointments toward Ambala or Chandigarh, DEEO file runs, shop-licence filings at the mini secretariat — and the copies multiply. A single A4 sheet cut at home covers them all without a studio\'s waiting-room detour.',
+        ],
+      },
+      {
+        heading: 'Where Hisar prints photos — bus stand, Delhi Road and the secretariat lanes',
+        paragraphs: [
+          'Studios cluster near the Hisar bus stand and along Delhi Road, pricing a sheet at ₹100–₹250, and the counters swell around admission and harvest-settlement weeks. Parallel to them, the photocopy shops around the mini secretariat print a prepared A4 PDF in minutes.',
+          'That is the loop Hisar residents now use: build the sheet on a phone, carry the PDF across the road, and finish at the counter — "passport photo in Hisar" reduced to one paper and one stop, instead of a half-day studio queue.',
+        ],
+      },
+      {
+        heading: 'Sizing up Hisar forms — Hau cards to licence files',
+        paragraphs: [
+          'The forms in circulation stay faithful to their sizes: passport work at 35×45 mm, PAN and voter files at 25×35 mm, stamp-size 20×25 mm for Hau admission and eve cards, and a Custom box for any bank or department form that prints its own millimetres.',
+          'FitMyPhotoA4 lays one chosen size across a true A4 page with margins and a cutting gap, exports PNG or PDF at 300 DPI, and never uploads the photo — comfortable on a shared café or metro-side device in Hisar. Every future copy is one re-print away.',
+        ],
+      },
+    ],
+    localTip:
+      'The Delhi Road shops near the bus stand are the fastest — hand over the PDF, say "A4, portrait, 100% scale", and you are done in minutes.',
+    faqItems: [
+      {
+        question: 'What photo size does a Hau student card usually need in Hisar?',
+        answer:
+          'Hau student and admission forms commonly ask for stamp size (20×25 mm) or passport size (35×45 mm). FitMyPhotoA4 has both presets, plus a Custom size for the exact box printed on your particular form.',
+      },
+      {
+        question: 'Where is the nearest passport centre from Hisar?',
+        answer:
+          'The regular passport-seva counters near Hisar are in Ambala and Chandigarh regions. Book ahead on passportindia.gov.in and carry 35×45 mm photos prepared with FitMyPhotoA4 so the appointment is not spent hunting for a studio.',
+      },
+      {
+        question: 'Do RTO Hisar (HR-20) licence forms need special photo sizes?',
+        answer:
+          'Haryana licence forms generally accept a recent 35×45 mm photograph on the form and medical certificate. If the HR-20 office prints a different box at the time of your visit, use the Custom size option to match millimetres exactly.',
+      },
+      {
+        question: 'Is it safe to prepare these photos on a public computer in Hisar?',
+        answer:
+          'Yes. The image is processed entirely in the browser and never transmitted, so a cyber café or shared machine in Hisar never sees or stores your photograph.',
+      },
+    ],
+  },
+  '/ambala': {
+    path: '/ambala',
+    name: 'Ambala',
+    district: 'Ambala',
+    nearbyCities: [
+      { name: 'Kurukshetra', path: '/kurukshetra' },
+      { name: 'Pehowa', path: '/pehowa' },
+      { name: 'Karnal', path: '/karnal' },
+    ],
+    rtoCodes: 'HR-01 / HR-37',
+    pincode: '133001',
+    famousPlaces: ['Ambala Cantt — city of scientific instruments', 'Ambala Junction Railway Station', 'Civil Lines & mini secretariat area', 'Ordnance & trade-market lanes'],
+    accent: '#5f3dc4',
+    variant: 3,
+    heroTitle: 'Ambala Passport & ID Photo Sheets — Cantt-City Print at Home',
+    metaTitle: 'Passport Photo Ambala | A4 ID Photo Sheet Maker (HR-01) — Free',
+    metaDescription:
+      'Passport photo in Ambala from home — A4 sheets for cantonment, RTO HR-01, PAN & voter. Print near Ambala Cantt, Ambala City or Civil Lines. No upload, free.',
+    intro:
+      'Ambala splits into Cantt and City, and its offices mirror that split — cantonment departments, the Civil Lines mini secretariat, RTO Ambala (HR-01) and the trade lanes of the instrument bazaar all summon photographs in their own sizes. Because a Passport Seva Kendra operates in the town itself, the smart move is a prepared A4 sheet: one PDF, one counter stop, every form covered.',
+    keywords: [
+      'passport photo in Ambala',
+      'photo print near Ambala Cantt',
+      'passport photo near Ambalainstrument bazaar',
+      'A4 photo sheet HR-01 Ambala',
+      'PAN photo 25×35 Ambala City',
+      'PSK Ambala passport appointment photo',
+      'stamp size photo trade licence',
+      'custom size photo sheet Civil Lines',
+    ],
+    sections: [
+      {
+        heading: 'Ambala\'s two halves, one growing photo habit',
+        paragraphs: [
+          'Cantonment-side offices manage works passes, ordnance-adjacent trade records and institutional files; on the City side, the mini secretariat, cooperative banks and school clusters keep KYC and admission photographs circulating. RTO Ambala (HR-01) licence files sit on both sides of that divide.',
+          'And because Ambala hosts one of the region\'s regular Passport Seva Kendra counters, a large share of appointments across north Haryana land in this town — tourists and residents alike arrive with packets of 35×45 mm photos. Preparing that packet at home first is now the local default.',
+        ],
+      },
+      {
+        heading: 'Where Ambala prints — the instrument bazaar and the Civil Lines lanes',
+        paragraphs: [
+          'The instrument bazaar and the Civil Lines shop rows carry both old studios — ₹100–₹250 a sheet — and fast digital counters that print a prepared A4 PDF as-is. Around weekend appointments those studio queues stretch across the pavement.',
+          'The dependable routine in Ambala is therefore to build the sheet before you leave: FitMyPhotoA4\'s presets (35×45, 25×35, 20×25 plus Custom) and the pen-drive PDF settle the print in one stop near the Cantt bazaar or Civil Lines, no marker-sketched sizes anywhere in sight.',
+        ],
+      },
+      {
+        heading: 'Sheets over studios — from trade files to PSK packets',
+        paragraphs: [
+          'The trade-licence files in the instrument lanes, the RTO HR-01 paperwork and the PSK appointment sheets all accept the same disciplined A4 sheet. One layout with margins and a cutting gap buys you the crop you cut with scissors, stamp-by-stamp, for years of files.',
+          'Everything renders at 300 DPI and stays in the browser — a genuine comfort in Ambala\'s shared khokha and café machines — and a fresh sheet is always one re-print away. That one PDF reliably covers the whole Cantt-and-City season of forms.',
+        ],
+      },
+    ],
+    localTip:
+      'Near the instrument bazaar or Civil Lines, one PDF on a pen drive — "A4, Actual size" — settles every office and PSK file in a single visit.',
+    faqItems: [
+      {
+        question: 'Does Ambala have its own passport office?',
+        answer:
+          'Ambala hosts one of the region\'s regular passport-seva counters, so applications from the town and from much of north Haryana are booked here on passportindia.gov.in. Carry 35×45 mm photos per the current PSK specification, prepared with FitMyPhotoA4 before your slot.',
+      },
+      {
+        question: 'Which size does RTO Ambala (HR-01) licence work normally need?',
+        answer:
+          'Haryana licence forms generally accept a recent 35×45 mm print on the form and medical certificate. If the HR-01 office prints a different box, use the Custom size option to match the millimetres on the form.',
+      },
+      {
+        question: 'Can the tool produce trade-licence photos for the Ambala instrument bazaar?',
+        answer:
+          'Trade and commission-agent forms across Ambala usually take stamp (20×25 mm) or passport (35×45 mm) photos. Both presets are in the maker, and the Custom box covers any unusual figure a shop-register file prints.',
+      },
+      {
+        question: 'Is processing private when used on a Cantt-area shared machine?',
+        answer:
+          'Yes. The photo is processed locally in the browser and never uploaded, stored or logged, so even a shared khokha or cyber-café machine in Ambala never sees your image.',
       },
     ],
   },
