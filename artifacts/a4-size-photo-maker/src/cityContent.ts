@@ -820,14 +820,14 @@ export const CITY_PAGES: Record<string, CityInfo> = {
 export const CITY_LINKS = Object.values(CITY_PAGES).map((c) => ({ name: c.name, path: c.path }));
 
 export const CITY_LABELS: Record<string, string> = {
-  '/kaithal': 'Kaithal photo sheets',
-  '/jind': 'Passport photos for Jind',
-  '/karnal': 'A4 sheets in Karnal',
-  '/panipat': 'Panipat file photos',
-  '/kurukshetra': 'ID photos Kurukshetra',
-  '/narwana': 'Narwana print sheets',
-  '/pehowa': 'Pehowa sheet maker',
-  '/cheeka': 'Cheeka tehsil photos',
-  '/hisar': 'Hisar Hau photo maker',
-  '/ambala': 'Ambala cantt sheets',
+  '/kaithal': 'Passport Size Photo & A4 Sheet Print in Kaithal',
+  '/jind': 'Online Passport Photo Maker in Jind',
+  '/karnal': 'A4 Photo Sheet Printing Service, Karnal',
+  '/panipat': 'Instant File Photo Sheets in Panipat',
+  '/kurukshetra': 'ID Photo & Passport Sheet Maker, Kurukshetra',
+  '/narwana': 'Print-Ready Photo Sheets in Narwana',
+  '/pehowa': 'Passport Photo Sheet Maker, Pehowa',
+  '/cheeka': 'Photo Sheet Printing Near Cheeka Tehsil',
+  '/hisar': 'Passport & ID Photo Maker in Hisar & Hansi',
+  '/ambala': 'A4 & Passport Photo Sheets, Ambala Cantt',
 };
