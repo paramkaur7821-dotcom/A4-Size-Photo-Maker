@@ -282,11 +282,13 @@ function SiteFooter() {
 
         <nav className="footer-col" aria-label="Photo tools">
           <h3>Photo tools</h3>
-          <a href="/passport-photo-size-maker">Passport photo maker</a>
-          <a href="/pan-card-photo-maker">PAN card photo maker</a>
-          <a href="/voter-id-photo-maker">Voter ID photo maker</a>
-          <a href="/#tool">Free A4 sheet maker</a>
-          <a href="/how-it-works">How it works</a>
+          <div className="footer-tools">
+            <a href="/passport-photo-size-maker"><span>01</span>Passport photo maker</a>
+            <a href="/pan-card-photo-maker"><span>02</span>PAN card photo maker</a>
+            <a href="/voter-id-photo-maker"><span>03</span>Voter ID photo maker</a>
+            <a href="/#tool"><span>04</span>Free A4 sheet maker</a>
+            <a href="/how-it-works"><span>05</span>How it works</a>
+          </div>
         </nav>
 
         <nav className="footer-col footer-col-cities" aria-label="Haryana local pages">
@@ -300,10 +302,12 @@ function SiteFooter() {
 
         <nav className="footer-col" aria-label="Company">
           <h3>Company</h3>
-          <a href="/about-us">About us</a>
-          <a href="/contact-us">Contact</a>
-          <a href="/blog">Blog & guides</a>
-          <a href="/faq">FAQ</a>
+          <div className="footer-company">
+            <a href="/about-us">About us</a>
+            <a href="/contact-us">Contact</a>
+            <a href="/blog">Blog & guides</a>
+            <a href="/faq">FAQ</a>
+          </div>
         </nav>
 
         <nav className="footer-col" aria-label="Legal">
