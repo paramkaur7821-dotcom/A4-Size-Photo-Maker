@@ -266,34 +266,57 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
 function SiteFooter() {
   return (
     <footer className="footer">
-      <div className="footer-brand">
-        <img className="footer-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
-        <div>
-          <strong>FitMyPhotoA4</strong>
-          <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
+      <div className="footer-main">
+        <div className="footer-about">
+          <div className="footer-brand">
+            <img className="footer-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
+            <div>
+              <strong>FitMyPhotoA4</strong>
+              <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> A quiet tool for the print counter.</span>
+            </div>
+          </div>
+          <p className="footer-tagline">
+            Measured passport, PAN, voter ID and licence photo sheets built for A4 printing — everything stays in your browser, and you print one sheet at your nearest shop.
+          </p>
         </div>
+
+        <nav className="footer-col" aria-label="Photo tools">
+          <h3>Photo tools</h3>
+          <a href="/passport-photo-size-maker">Passport photo maker</a>
+          <a href="/pan-card-photo-maker">PAN card photo maker</a>
+          <a href="/voter-id-photo-maker">Voter ID photo maker</a>
+          <a href="/#tool">Free A4 sheet maker</a>
+          <a href="/how-it-works">How it works</a>
+        </nav>
+
+        <nav className="footer-col footer-col-cities" aria-label="Haryana local pages">
+          <h3>Haryana · local pages</h3>
+          <div className="footer-city-links">
+            {CITY_LINKS.map((city) => (
+              <a key={city.path} href={city.path}>{city.name}<span>→</span></a>
+            ))}
+          </div>
+        </nav>
+
+        <nav className="footer-col" aria-label="Company">
+          <h3>Company</h3>
+          <a href="/about-us">About us</a>
+          <a href="/contact-us">Contact</a>
+          <a href="/blog">Blog & guides</a>
+          <a href="/faq">FAQ</a>
+        </nav>
+
+        <nav className="footer-col" aria-label="Legal">
+          <h3>Legal</h3>
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms-of-use">Terms of Use</a>
+        </nav>
       </div>
-      <span className="footer-links">
-        <a href="/passport-photo-size-maker">Passport</a>
-        <a href="/pan-card-photo-maker">PAN Card</a>
-        <a href="/voter-id-photo-maker">Voter ID</a>
-        <a href="/how-it-works">How it works</a>
-        <a href="/blog">Blog</a>
-        <a href="/about-us">About</a>
-        <a href="/contact-us">Contact</a>
-        <a href="/privacy-policy">Privacy</a>
-        <a href="/terms-of-use">Terms</a>
-      </span>
-      <span className="footer-cities" aria-label="Local SEO pages">
-        <a href={CITY_LINKS[0].path}>{CITY_LINKS[0].name}</a>
-        <a href={CITY_LINKS[1].path}>{CITY_LINKS[1].name}</a>
-        <a href={CITY_LINKS[2].path}>{CITY_LINKS[2].name}</a>
-        <a href={CITY_LINKS[3].path}>{CITY_LINKS[3].name}</a>
-        <a href={CITY_LINKS[4].path}>{CITY_LINKS[4].name}</a>
-        <a href={CITY_LINKS[5].path}>{CITY_LINKS[5].name}</a>
-        <a href={CITY_LINKS[6].path}>{CITY_LINKS[6].name}</a>
-        <a href={CITY_LINKS[7].path}>{CITY_LINKS[7].name}</a>
-      </span>
+
+      <div className="footer-bottom">
+        <span>© 2026 FitMyPhotoA4 · Free photo sheets, no signup, no upload.</span>
+        <span>Print counters in Haryana deserve better than marker-sketched sizes.</span>
+      </div>
     </footer>
   );
 }
