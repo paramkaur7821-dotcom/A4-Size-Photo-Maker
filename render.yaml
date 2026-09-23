@@ -13,3 +13,31 @@ services:
         value: "20742"
       - key: BASE_PATH
         value: /
+
+  - type: web
+    name: a4-size-photo-maker-api
+    runtime: node
+    rootDir: artifacts/api-server
+    plan: free
+    buildCommand: echo ready
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATA_DIR
+        value: /var/data
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_SECURE
+        value: "0"
+      - key: ADMIN_PASSWORD
+        sync: false
