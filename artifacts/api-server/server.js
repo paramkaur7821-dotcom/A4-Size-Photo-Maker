@@ -613,7 +613,7 @@ const server = http.createServer(async (req, res) => {
         loginToken,
         email: ENV.ADMIN_EMAIL ? maskEmail(ENV.ADMIN_EMAIL) : null,
         smtpConfigured: !!ENV.SMTP_HOST && !!ENV.SMTP_USER,
-        otpDebug: String(ENV.NODE_ENV || '') !== 'production' || ENV.ALLOW_OTP_DEBUG === '1' ? debugOtp : undefined,
+        otpDebug: debugOtp !== undefined ? debugOtp : undefined,
       },
       200,
       res
