@@ -49,6 +49,22 @@ function write(key: string, value: unknown) {
   }
 }
 
+function safeGet(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeRemove(key: string) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
 export function loadSettings(): Partial<AdminSettings> {
   return read<Partial<AdminSettings>>(KEY_SETTINGS, {});
 }
@@ -81,29 +97,33 @@ export function loadPassword(): string {
 }
 
 export function isAdminLoggedIn(): boolean {
-  return window.localStorage.getItem(KEY_SESSION) === '1';
+  return safeGet(KEY_SESSION) === '1';
 }
 
 export function login(password: string): boolean {
   if (password !== loadPassword()) return false;
-  window.localStorage.setItem(KEY_SESSION, '1');
+  write(KEY_SESSION, '1');
   return true;
 }
 
 export function logout() {
-  window.localStorage.removeItem(KEY_SESSION);
+  safeRemove(KEY_SESSION);
 }
 
 export type VisitLog = { path: string; ts: number };
 
 export function bumpVisit(path: string = '/'): number {
-  const n = Number(window.localStorage.getItem(KEY_VISITS) || '0') + 1;
-  window.localStorage.setItem(KEY_VISITS, String(n));
-  const log = read<VisitLog[]>(KEY_LOG, []);
-  log.unshift({ path, ts: Date.now() });
-  if (log.length > 80) log.length = 80;
-  write(KEY_LOG, log);
-  return n;
+  try {
+    const n = Number(safeGet(KEY_VISITS) || '0') + 1;
+    write(KEY_VISITS, n);
+    const log = read<VisitLog[]>(KEY_LOG, []);
+    log.unshift({ path, ts: Date.now() });
+    if (log.length > 80) log.length = 80;
+    write(KEY_LOG, log);
+    return n;
+  } catch {
+    return 0;
+  }
 }
 
 export function readVisits(): number {

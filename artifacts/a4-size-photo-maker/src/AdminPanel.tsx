@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { Component, useState } from 'react';
+import type { ReactNode } from 'react';
 import {
   LayoutDashboard,
   MapPin,
@@ -640,14 +641,16 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
           <span className="admin-kicker">fitmyphotoa4.com · admin</span>
           <span className="admin-chip"><ShieldCheck size={12} /> Authenticated</span>
         </div>
-        {tab === 'dashboard' && <Dashboard go={setTab} />}
-        {tab === 'analytics' && <Analytics />}
-        {tab === 'tools' && <ToolsManager />}
-        {tab === 'cities' && <CityPagesEditor />}
-        {tab === 'blog' && <BlogManager />}
-        {tab === 'pages' && <PagesBrowser />}
-        {tab === 'footer' && <FooterEditor />}
-        {tab === 'settings' && <AdminSettings />}
+        <AdminErrorBoundary>
+          {tab === 'dashboard' && <Dashboard go={setTab} />}
+          {tab === 'analytics' && <Analytics />}
+          {tab === 'tools' && <ToolsManager />}
+          {tab === 'cities' && <CityPagesEditor />}
+          {tab === 'blog' && <BlogManager />}
+          {tab === 'pages' && <PagesBrowser />}
+          {tab === 'footer' && <FooterEditor />}
+          {tab === 'settings' && <AdminSettings />}
+        </AdminErrorBoundary>
       </div>
     </div>
   );
@@ -656,4 +659,23 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
 export default function AdminPanel() {
   const [authed, setAuthed] = useState(isAdminLoggedIn);
   return authed ? <AdminShell onLogout={() => { logout(); setAuthed(false); }} /> : <AdminLogin onSuccess={() => setAuthed(true)} />;
+}
+
+class AdminErrorBoundary extends Component<{ children: ReactNode }, { ok: boolean }> {
+  state = { ok: true };
+  static getDerivedStateFromError() {
+    return { ok: false };
+  }
+  render() {
+    if (!this.state.ok) {
+      return (
+        <div className="admin-content" style={{ textAlign: 'center', padding: 60 }}>
+          <h2>Something went wrong in this section</h2>
+          <p>Refresh the page to continue.</p>
+          <button className="admin-btn admin-btn-primary" onClick={() => { this.setState({ ok: true }); }}>Try again</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
