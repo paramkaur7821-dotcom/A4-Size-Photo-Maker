@@ -16,10 +16,21 @@ import {
   Eye,
   Check,
   ShieldCheck,
+  BarChart3,
+  Boxes,
+  Globe,
+  PenLine,
+  LayoutGrid,
+  BookOpenText,
+  Workflow,
+  FileText,
+  Clock,
+  TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
 import { CITY_PAGES, CITY_LINKS, CITY_LABELS } from './cityContent';
 import { BLOG_POSTS } from './blogContent';
+import { ALL_SEO_PAGES } from './seoContent';
 import {
   loadSettings,
   saveSettings,
@@ -32,10 +43,11 @@ import {
   logout,
   bumpVisit,
   readVisits,
+  readVisitLog,
   DEFAULT_ADMIN_PASSWORD,
 } from './adminConfig';
 
-type TabId = 'dashboard' | 'cities' | 'blog' | 'footer' | 'settings';
+type TabId = 'dashboard' | 'analytics' | 'tools' | 'cities' | 'blog' | 'pages' | 'footer' | 'settings';
 
 type SeedPost = { slug: string; title: string; excerpt?: string };
 
@@ -43,10 +55,22 @@ const SEED_POSTS = BLOG_POSTS as unknown as SeedPost[];
 
 const NAV: { id: TabId; label: string; icon: LucideIcon }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'tools', label: 'Tools', icon: Boxes },
   { id: 'cities', label: 'City Pages', icon: MapPin },
   { id: 'blog', label: 'Blog', icon: Newspaper },
+  { id: 'pages', label: 'SEO Pages', icon: LayoutGrid },
   { id: 'footer', label: 'Footer', icon: Eye },
   { id: 'settings', label: 'Settings', icon: Settings },
+];
+
+const TOOL_CARDS: { title: string; desc: string; href: string; icon: LucideIcon }[] = [
+  { title: 'Passport Photo Maker', desc: '35 × 45 mm passport-size sheet for office, exam and PSK files.', href: '/passport-photo-size-maker', icon: FileText },
+  { title: 'PAN Card Photo Maker', desc: '25 × 35 mm PAN Card and voter-size prints on A4.', href: '/pan-card-photo-maker', icon: FileText },
+  { title: 'Voter ID Photo Maker', desc: '25 × 35 mm sheet built for Voter ID and licence forms.', href: '/voter-id-photo-maker', icon: FileText },
+  { title: 'Free A4 Sheet Maker', desc: 'Upload once, lay out any custom size, download a printable A4 PDF.', href: '/#tool', icon: Workflow },
+  { title: 'How It Works', desc: 'The 3-minute walkthrough from upload to print counter.', href: '/how-it-works', icon: BookOpenText },
+  { title: 'FAQ', desc: 'Sizes, printing and passport-centre questions answered.', href: '/faq', icon: Globe },
 ];
 
 function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
@@ -68,14 +92,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
         <div className="admin-login-lock"><LockKeyhole size={26} /></div>
         <h1>FitMyPhotoA4 Admin</h1>
         <p>Enter the admin password to open the panel.</p>
-        <input
-          className="admin-input"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Admin password"
-          autoFocus
-        />
+        <input className="admin-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Admin password" autoFocus />
         {error && <div className="admin-error">{error}</div>}
         <button className="admin-btn admin-btn-primary" type="submit">Unlock panel</button>
         <span className="admin-login-hint">Default password: {DEFAULT_ADMIN_PASSWORD}</span>
@@ -84,12 +101,27 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-function StatCard({ label, value, tone }: { label: string; value: string | number; tone?: string }) {
+function StatCard({ label, value, tone, icon }: { label: string; value: string | number; tone?: string; icon?: LucideIcon }) {
+  const Icon = icon;
   return (
     <div className="admin-stat">
-      <span>{label}</span>
+      <div className="admin-stat-top">
+        <span>{label}</span>
+        {Icon && <Icon size={15} style={{ color: tone ?? 'currentColor' }} />}
+      </div>
       <strong style={tone ? { color: tone } : undefined}>{value}</strong>
     </div>
+  );
+}
+
+function QuickCard({ title, desc, action, onClick, icon: Icon }: { title: string; desc: string; action: string; onClick: () => void; icon: LucideIcon }) {
+  return (
+    <button className="admin-quick" onClick={onClick}>
+      <span className="admin-quick-icon"><Icon size={18} /></span>
+      <strong>{title}</strong>
+      <span className="admin-muted">{desc}</span>
+      <span className="admin-quick-action">{action} →</span>
+    </button>
   );
 }
 
@@ -97,6 +129,9 @@ function Dashboard({ go }: { go: (tab: TabId) => void }) {
   const visits = readVisits();
   const cities = Object.keys(CITY_PAGES).length;
   const drafts = loadDrafts().length;
+  const labels = Object.keys(loadLabels()).length;
+  const log = readVisitLog();
+  const today = log.filter((l) => Date.now() - l.ts < 86400000).length;
 
   return (
     <div className="admin-content">
@@ -105,28 +140,35 @@ function Dashboard({ go }: { go: (tab: TabId) => void }) {
           <div className="admin-kicker">Overview</div>
           <h1 className="admin-page-title">Dashboard</h1>
         </div>
-        <button className="admin-btn" onClick={() => bumpVisit()}>Simulate a visit</button>
+        <button className="admin-btn" onClick={() => bumpVisit('/admin')}>Log a test visit</button>
       </div>
 
       <div className="admin-stats">
-        <StatCard label="Site visits (this browser)" value={visits} tone="#0ca678" />
-        <StatCard label="Haryana city pages live" value={cities} tone="#7c5cff" />
-        <StatCard label="Blog games drafts" value={drafts} tone="#e8590c" />
-        <StatCard label="Footer label overrides" value={Object.keys(loadLabels()).length} tone="#0c8599" />
+        <StatCard label="Total visits" value={visits} tone="#0ca678" icon={TrendingUp} />
+        <StatCard label="Visits today" value={today} tone="#7c5cff" icon={Clock} />
+        <StatCard label="City pages live" value={cities} tone="#e8590c" icon={MapPin} />
+        <StatCard label="Blog drafts" value={drafts} tone="#0c8599" icon={PenLine} />
+        <StatCard label="Footer labels" value={labels} tone="#f76707" icon={Boxes} />
+        <StatCard label="SEO pages" value={Object.keys(ALL_SEO_PAGES).length} tone="#2b8a3e" icon={LayoutGrid} />
       </div>
 
-      <div className="admin-card">
-        <h2>Quick actions</h2>
-        <div className="admin-actions">
-          <button className="admin-btn admin-btn-primary" onClick={() => go('cities')}>Edit city labels</button>
-          <button className="admin-btn" onClick={() => go('blog')}>Write a blog draft</button>
-          <button className="admin-btn" onClick={() => go('footer')}>Tune footer text</button>
-          <button className="admin-btn" onClick={() => go('settings')}>Change admin password</button>
+      <div>
+        <div className="admin-kicker" style={{ marginBottom: 12 }}>Quick actions</div>
+        <div className="admin-quick-grid">
+          <QuickCard title="City pages" desc="Edit the footer card labels for all 10 Haryana cities." action="Open editor" onClick={() => go('cities')} icon={MapPin} />
+          <QuickCard title="Write a blog post" desc="Draft a new guide with title, slug and body." action="New draft" onClick={() => go('blog')} icon={PenLine} />
+          <QuickCard title="Footer editor" desc="Change brand name, tagline and city-card visibility." action="Open footer" onClick={() => go('footer')} icon={Eye} />
+          <QuickCard title="Analytics" desc="See the visit log and most-viewed city pages." action="View stats" onClick={() => go('analytics')} icon={BarChart3} />
+          <QuickCard title="Settings" desc="Site identity, accent colour and admin password." action="Open settings" onClick={() => go('settings')} icon={Settings} />
+          <QuickCard title="SEO pages" desc="Browse the static info, tool and guide pages." action="Browse pages" onClick={() => go('pages')} icon={LayoutGrid} />
         </div>
       </div>
 
       <div className="admin-card">
-        <h2>City pages at a glance</h2>
+        <div className="admin-card-head">
+          <h2>City pages at a glance</h2>
+          <a className="admin-btn admin-btn-small" href="/">View live site <ExternalLink size={13} /></a>
+        </div>
         <div className="admin-citybar">
           {Object.values(CITY_PAGES).map((c) => (
             <div className="admin-citybar-item" key={c.path} title={`${c.name} · variant ${c.variant}`}>
@@ -140,18 +182,121 @@ function Dashboard({ go }: { go: (tab: TabId) => void }) {
   );
 }
 
+function Analytics() {
+  const log = readVisitLog();
+  const counts: Record<string, number> = {};
+  for (const l of log) counts[l.path] = (counts[l.path] || 0) + 1;
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const max = Math.max(1, ...top.map((t) => t[1]));
+  const cityHits = Object.entries(counts).filter(([p]) => CITY_PAGES[p]).reduce((a, kv) => a + kv[1], 0);
+
+  return (
+    <div className="admin-content">
+      <div className="admin-page-head">
+        <div>
+          <div className="admin-kicker">Reports</div>
+          <h1 className="admin-page-title">Analytics</h1>
+        </div>
+        <span className="admin-chip"><Clock size={12} /> Last {log.length} visits logged</span>
+      </div>
+
+      <div className="admin-stats">
+        <StatCard label="Total visits" value={readVisits()} tone="#0ca678" icon={TrendingUp} />
+        <StatCard label="City page hits" value={cityHits} tone="#7c5cff" icon={MapPin} />
+        <StatCard label="Unique routes hit" value={Object.keys(counts).length} tone="#e8590c" icon={Globe} />
+        <StatCard label="Log entries" value={log.length} tone="#0c8599" icon={Clock} />
+      </div>
+
+      {log.length === 0 && <div className="admin-card"><h2>No data yet</h2><p className="admin-muted">Visit a few pages — or press "Log a test visit" on the dashboard — and the charts appear here.</p></div>}
+
+      {top.length > 0 && (
+        <div className="admin-card">
+          <h2>Most viewed routes</h2>
+          <div className="admin-bars">
+            {top.map(([path, n]) => (
+              <div className="admin-bars-row" key={path}>
+                <span className="admin-bars-label">{path === '/' ? 'Home / Maker' : path}</span>
+                <span className="admin-bars-track">
+                  <span className="admin-bars-fill" style={{ width: `${Math.max(6, (n / max) * 100)}%` }} />
+                </span>
+                <span className="admin-bars-count">{n}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {log.length > 0 && (
+        <div className="admin-card">
+          <h2>Visit log</h2>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Route</th><th style={{ width: 220 }}>Time</th></tr></thead>
+              <tbody>
+                {log.slice(0, 25).map((l, i) => (
+                  <tr key={l.ts + '-' + i}>
+                    <td>{l.path === '/' ? 'Home / Maker' : l.path}</td>
+                    <td className="admin-muted">{new Date(l.ts).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToolsManager() {
+  return (
+    <div className="admin-content">
+      <div className="admin-page-head">
+        <div>
+          <div className="admin-kicker">Featured tools</div>
+          <h1 className="admin-page-title">Photo tools</h1>
+        </div>
+        <span className="admin-chip"><Boxes size={12} /> Live on site</span>
+      </div>
+
+      <div className="admin-tool-grid">
+        {TOOL_CARDS.map((t) => {
+          const Icon = t.icon;
+          return (
+            <a className="admin-tool-card" href={t.href} key={t.title}>
+              <span className="admin-tool-icon"><Icon size={20} /></span>
+              <span className="admin-tool-title">{t.title}</span>
+              <span className="admin-muted">{t.desc}</span>
+              <span className="admin-tool-open">Open tool →</span>
+            </a>
+          );
+        })}
+      </div>
+
+      <div className="admin-card">
+        <h2>Routing status</h2>
+        <div className="admin-list">
+          <div className="admin-list-row"><div><strong>Vercel</strong><span className="admin-muted">https://a4-size-photo-maker.vercel.app — primary</span></div><span className="admin-badge ok">Ready</span></div>
+          <div className="admin-list-row"><div><strong>Render</strong><span className="admin-muted">https://a4-size-photo-maker.onrender.com — static mirror</span></div><span className="admin-badge ok">Ready</span></div>
+          <div className="admin-list-row"><div><strong>Admin route</strong><span className="admin-muted">/admin — this panel</span></div><span className="admin-badge ok">Open</span></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CityPagesEditor() {
   const merged = { ...CITY_LABELS, ...loadLabels() };
   const [labels, setLabels] = useState<Record<string, string>>(merged);
+  const [editing, setEditing] = useState<string | null>(null);
   const [saved, setSaved] = useState('');
 
-  const update = (path: string, label: string) => {
-    setLabels((prev) => ({ ...prev, [path]: label }));
-  };
+  const update = (path: string, label: string) => setLabels((prev) => ({ ...prev, [path]: label }));
 
   const persist = (path: string) => {
     saveLabel(path, labels[path]);
-    setSaved(`Saved: ${labels[path]}`);
+    setEditing(null);
+    setSaved(`Saved label for ${CITY_PAGES[path].name}: ${labels[path]}`);
   };
 
   return (
@@ -161,56 +306,47 @@ function CityPagesEditor() {
           <div className="admin-kicker">Haryana · local pages</div>
           <h1 className="admin-page-title">City Pages</h1>
         </div>
-        <span className="admin-chip">Live site · {Object.keys(CITY_PAGES).length} pages</span>
+        <span className="admin-chip"><MapPin size={12} /> {Object.keys(CITY_PAGES).length} pages live</span>
       </div>
 
       {saved && <div className="admin-success">{saved}</div>}
 
-      <div className="admin-card">
-        <h2>Footer card labels</h2>
-        <p className="admin-muted">Change the text shown on each city card in the footer. Save per city.</p>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr><th>City</th><th>Variant</th><th>Footer label</th><th style={{ width: 110 }}>Action</th></tr>
-            </thead>
-            <tbody>
-              {CITY_LINKS.map((city) => (
-                <tr key={city.path}>
-                  <td>
-                    <span className="admin-swatch" style={{ background: CITY_PAGES[city.path].accent }} />
-                    <strong>{city.name}</strong>
-                    <span className="admin-muted"> {CITY_PAGES[city.path].district}</span>
-                  </td>
-                  <td><span className="admin-badge">v{CITY_PAGES[city.path].variant}</span></td>
-                  <td>
-                    <input
-                      className="admin-input"
-                      value={labels[city.path] ?? ''}
-                      onChange={(e) => update(city.path, e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <button className="admin-btn admin-btn-small admin-btn-primary" onClick={() => persist(city.path)}>
-                      <Save size={14} /> Save
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="admin-card">
-        <h2>Open a city page</h2>
-        <div className="admin-actions admin-actions-wrap">
-          {CITY_LINKS.map((city) => (
-            <a className="admin-btn" href={city.path} key={city.path}>
-              {city.name} <ExternalLink size={13} />
-            </a>
-          ))}
-        </div>
+      <div className="admin-city-grid">
+        {CITY_LINKS.map((city) => {
+          const info = CITY_PAGES[city.path];
+          return (
+            <div className="admin-city-card" key={city.path} style={{ borderTopColor: info.accent }}>
+              <div className="admin-city-card-top">
+                <span className="admin-swatch-lg" style={{ background: info.accent }} />
+                <div>
+                  <strong>{info.name}</strong>
+                  <span className="admin-muted">{info.district} district</span>
+                </div>
+                <span className="admin-badge">v{info.variant}</span>
+              </div>
+              <div className="admin-city-card-label">
+                <span className="admin-muted">Footer label</span>
+                {editing === city.path ? (
+                  <>
+                    <input className="admin-input" value={labels[city.path] ?? ''} onChange={(e) => update(city.path, e.target.value)} />
+                    <div className="admin-city-card-actions">
+                      <button className="admin-btn admin-btn-small admin-btn-primary" onClick={() => persist(city.path)}><Save size={13} /> Save</button>
+                      <button className="admin-btn admin-btn-small" onClick={() => setEditing(null)}>Cancel</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="admin-city-label-text">{labels[city.path] ?? city.name}</span>
+                    <div className="admin-city-card-actions">
+                      <button className="admin-btn admin-btn-small" onClick={() => setEditing(city.path)}><PenLine size={13} /> Edit</button>
+                      <a className="admin-btn admin-btn-small" href={city.path}>Visit <ExternalLink size={12} /></a>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -227,13 +363,14 @@ function BlogManager() {
   const addDraft = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !slug.trim()) return;
+    const cleanSlug = slug.trim().replace(/ /g, '-').toLowerCase();
     const next = [
-      { id: String(Date.now()), title: title.trim(), slug: slug.trim().replace(/ /g, '-').toLowerCase(), excerpt: excerpt.trim(), body: body.trim(), createdAt: new Date().toISOString() },
+      { id: String(Date.now()), title: title.trim(), slug: cleanSlug, excerpt: excerpt.trim(), body: body.trim(), createdAt: new Date().toISOString() },
       ...drafts,
     ];
     saveDrafts(next);
     setDrafts(next);
-    setConfirm(`Draft saved — /blog/${slug.trim().replace(/ /g, '-').toLowerCase()}`);
+    setConfirm(`Draft saved — /blog/${cleanSlug}`);
     setTitle('');
     setSlug('');
     setExcerpt('');
@@ -253,7 +390,7 @@ function BlogManager() {
           <div className="admin-kicker">Content</div>
           <h1 className="admin-page-title">Blog</h1>
         </div>
-        <span className="admin-chip">{drafts.length} drafts</span>
+        <span className="admin-chip"><Newspaper size={12} /> {drafts.length} drafts</span>
       </div>
 
       <div className="admin-card">
@@ -278,9 +415,7 @@ function BlogManager() {
                 <strong>{d.title}</strong>
                 <span className="admin-muted">/blog/{d.slug} · {new Date(d.createdAt).toLocaleDateString()}</span>
               </div>
-              <button className="admin-btn admin-btn-danger admin-btn-small" onClick={() => removeDraft(d.id)}>
-                <Trash2 size={14} /> Delete
-              </button>
+              <button className="admin-btn admin-btn-danger admin-btn-small" onClick={() => removeDraft(d.id)}><Trash2 size={14} /> Delete</button>
             </div>
           ))}
         </div>
@@ -288,20 +423,42 @@ function BlogManager() {
 
       <div className="admin-card">
         <h2>Published posts</h2>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead><tr><th>Title</th><th>Slug</th><th style={{ width: 110 }}>Open</th></tr></thead>
-            <tbody>
-              {SEED_POSTS.map((p) => (
-                <tr key={p.slug}>
-                  <td>{p.title}</td>
-                  <td className="admin-muted">/blog/{p.slug}</td>
-                  <td><a className="admin-btn admin-btn-small" href={`/blog/${p.slug}`}>Visit <ExternalLink size={12} /></a></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="admin-post-grid">
+          {SEED_POSTS.map((p) => (
+            <a className="admin-post-card" href={`/blog/${p.slug}`} key={p.slug}>
+              <BookOpenText size={17} />
+              <strong>{p.title}</strong>
+              <span className="admin-muted">{p.excerpt || '/blog/' + p.slug}</span>
+              <span className="admin-tool-open">Read post →</span>
+            </a>
+          ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function PagesBrowser() {
+  const pages = Object.values(ALL_SEO_PAGES);
+  return (
+    <div className="admin-content">
+      <div className="admin-page-head">
+        <div>
+          <div className="admin-kicker">Static content</div>
+          <h1 className="admin-page-title">SEO Pages</h1>
+        </div>
+        <span className="admin-chip"><LayoutGrid size={12} /> {pages.length} pages</span>
+      </div>
+      <p className="admin-muted">Tool pages, guides, legal pages and the main FAQ — all live, all indexable.</p>
+      <div className="admin-post-grid">
+        {pages.map((p) => (
+          <a className="admin-post-card" href={p.path} key={p.path}>
+            <FileText size={17} />
+            <strong>{p.title}</strong>
+            <span className="admin-muted">{p.path}</span>
+            <span className="admin-tool-open">View page →</span>
+          </a>
+        ))}
       </div>
     </div>
   );
@@ -349,10 +506,17 @@ function FooterEditor() {
       </form>
 
       <div className="admin-card">
+        <h2>Preview</h2>
+        <div className="admin-preview">
+          <strong>{siteName || 'FitMyPhotoA4'}</strong>
+          <span>{brandLine || 'A quiet tool for the print counter.'}</span>
+          <p>{tagline}</p>
+        </div>
+      </div>
+
+      <div className="admin-card">
         <h2>Tip</h2>
-        <p className="admin-muted">
-          City card labels are edited under <strong>City Pages</strong>. Law, Privacy and company links are text cards — turn brand text bigger in Settings if a card looks cramped.
-        </p>
+        <p className="admin-muted">City card labels are edited under <strong>City Pages</strong>. Company and Legal links are small text cards.</p>
       </div>
     </div>
   );
@@ -380,6 +544,10 @@ function AdminSettings() {
       setSaved('Password too short — use at least 6 characters.');
       return;
     }
+    if (confirmPass !== newPassword) {
+      setSaved('Passwords do not match.');
+      return;
+    }
     const current = loadSettings();
     saveSettings({ ...current, password: newPassword });
     setNewPassword('');
@@ -404,27 +572,28 @@ function AdminSettings() {
 
       {saved && <div className="admin-success">{saved}</div>}
 
-      <form className="admin-card admin-form" onSubmit={persistSettings}>
-        <h2>Site identity</h2>
-        <label>Site name<input className="admin-input" value={siteName} onChange={(e) => setSiteName(e.target.value)} /></label>
-        <label>
-          Contact email <Mail size={12} style={{ verticalAlign: 'middle' }} />
-          <input className="admin-input" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="hello@fitmyphotoa4.com" />
-        </label>
-        <label>
-          Accent colour <Palette size={12} style={{ verticalAlign: 'middle' }} />
-          <input className="admin-input" value={accent} onChange={(e) => setAccent(e.target.value)} placeholder="#7c5cff" />
-        </label>
-        <button className="admin-btn admin-btn-primary" type="submit"><Save size={15} /> Save settings</button>
-      </form>
+      <div className="admin-settings-grid">
+        <form className="admin-card admin-form" onSubmit={persistSettings}>
+          <h2>Site identity</h2>
+          <label>Site name<input className="admin-input" value={siteName} onChange={(e) => setSiteName(e.target.value)} /></label>
+          <label>
+            Contact email <Mail size={12} style={{ verticalAlign: 'middle' }} />
+            <input className="admin-input" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="hello@fitmyphotoa4.com" />
+          </label>
+          <label>
+            Accent colour <Palette size={12} style={{ verticalAlign: 'middle' }} />
+            <input className="admin-input" value={accent} onChange={(e) => setAccent(e.target.value)} placeholder="#7c5cff" />
+          </label>
+          <button className="admin-btn admin-btn-primary" type="submit"><Save size={15} /> Save settings</button>
+        </form>
 
-      <form className="admin-card admin-form" onSubmit={changePassword}>
-        <h2>Change admin password</h2>
-        <label>New password<input className="admin-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></label>
-        <label>Confirm password<input className="admin-input" type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} /></label>
-        {confirmPass && newPassword !== confirmPass && <div className="admin-error">Passwords do not match.</div>}
-        <button className="admin-btn" type="submit">Update password</button>
-      </form>
+        <form className="admin-card admin-form" onSubmit={changePassword}>
+          <h2>Change admin password</h2>
+          <label>New password<input className="admin-input" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></label>
+          <label>Confirm password<input className="admin-input" type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} /></label>
+          <button className="admin-btn" type="submit">Update password</button>
+        </form>
+      </div>
 
       <div className="admin-card">
         <h2>Danger zone</h2>
@@ -452,11 +621,7 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
           {NAV.map((item) => {
             const Icon = item.icon;
             return (
-              <button
-                key={item.id}
-                className={tab === item.id ? 'admin-nav-item active' : 'admin-nav-item'}
-                onClick={() => setTab(item.id)}
-              >
+              <button key={item.id} className={tab === item.id ? 'admin-nav-item active' : 'admin-nav-item'} onClick={() => setTab(item.id)}>
                 <Icon size={17} />
                 <span>{item.label}</span>
                 {tab === item.id && <Check size={14} className="admin-nav-check" />}
@@ -476,8 +641,11 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
           <span className="admin-chip"><ShieldCheck size={12} /> Authenticated</span>
         </div>
         {tab === 'dashboard' && <Dashboard go={setTab} />}
+        {tab === 'analytics' && <Analytics />}
+        {tab === 'tools' && <ToolsManager />}
         {tab === 'cities' && <CityPagesEditor />}
         {tab === 'blog' && <BlogManager />}
+        {tab === 'pages' && <PagesBrowser />}
         {tab === 'footer' && <FooterEditor />}
         {tab === 'settings' && <AdminSettings />}
       </div>

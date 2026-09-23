@@ -1261,7 +1261,7 @@ function App() {
   });
 
   useEffect(() => {
-    bumpVisit();
+    bumpVisit(currentPath);
     const handlePopState = () => {
       const path = window.location.pathname.replace(/\/+$/, '');
       setCurrentPath(path || '/');

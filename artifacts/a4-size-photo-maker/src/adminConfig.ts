@@ -3,6 +3,7 @@ const KEY_LABELS = 'fmp_admin_city_labels';
 const KEY_DRAFTS = 'fmp_admin_drafts';
 const KEY_SESSION = 'fmp_admin_session';
 const KEY_VISITS = 'fmp_visits';
+const KEY_LOG = 'fmp_visit_log';
 
 export const DEFAULT_ADMIN_PASSWORD = 'fitmyphoto2026';
 
@@ -93,12 +94,22 @@ export function logout() {
   window.localStorage.removeItem(KEY_SESSION);
 }
 
-export function bumpVisit(): number {
+export type VisitLog = { path: string; ts: number };
+
+export function bumpVisit(path: string = '/'): number {
   const n = Number(window.localStorage.getItem(KEY_VISITS) || '0') + 1;
   window.localStorage.setItem(KEY_VISITS, String(n));
+  const log = read<VisitLog[]>(KEY_LOG, []);
+  log.unshift({ path, ts: Date.now() });
+  if (log.length > 80) log.length = 80;
+  write(KEY_LOG, log);
   return n;
 }
 
 export function readVisits(): number {
   return Number(window.localStorage.getItem(KEY_VISITS) || '0');
+}
+
+export function readVisitLog(): VisitLog[] {
+  return read<VisitLog[]>(KEY_LOG, []);
 }
