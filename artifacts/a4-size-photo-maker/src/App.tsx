@@ -507,10 +507,17 @@ function BlogPostView({ post }: { post: ApiBlogPost }) {
       <main id="main-content" className="main-wrap seo-page">
         <section className="seo-hero" aria-labelledby="seo-page-title">
           <div className="seo-hero-copy">
-            <div className="eyebrow">{post.category || 'Guide'} · Custom post</div>
+            <div className="eyebrow">{post.category || 'Guide'} · {post.author ? `by ${post.author} · ` : ''}Custom post</div>
             <h1 id="seo-page-title">{post.title}</h1>
             {post.featuredImage && <img className="blog-featured" src={post.featuredImage} alt={post.title} loading="lazy" decoding="async" />}
             {post.excerpt && <p className="hero-intro">{post.excerpt}</p>}
+            {Array.isArray(post.tags) && post.tags.length > 0 && (
+              <div className="blog-tags">
+                {post.tags.map((t) => (
+                  <span key={t}>#{t.replace(/\s+/g, '')}</span>
+                ))}
+              </div>
+            )}
             <div className="seo-hero-actions">
               <a className="button button-primary" href="/#tool">Open the photo maker</a>
               <a className="button button-line" href="/blog">More guides</a>
@@ -524,6 +531,19 @@ function BlogPostView({ post }: { post: ApiBlogPost }) {
           </div>
         </section>
         <article className="seo-article blog-article" dangerouslySetInnerHTML={{ __html: post.content }} />
+        {Array.isArray(post.faq) && post.faq.length > 0 && (
+          <section className="seo-page-faq" id="post-faq" aria-labelledby="post-faq-title">
+            <h2 id="post-faq-title">Frequently asked questions</h2>
+            <div className="faq-list">
+              {post.faq.map((f, i) => (
+                <details className="tutorial-faq-item" key={i}>
+                  <summary><span>{String(i + 1).padStart(2, '0')} · {f.q}</span><ChevronDown size={15} /></summary>
+                  <p>{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="seo-related" aria-label="Related blog pages">
           <div>
             <div className="section-kicker">Keep reading</div>

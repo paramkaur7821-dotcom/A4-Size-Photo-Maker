@@ -26,6 +26,9 @@ export type BlogPost = {
   metaTitle: string;
   metaDescription: string;
   featuredImage: string;
+  author: string;
+  tags: string[];
+  faq: { q: string; a: string }[];
   status: 'draft' | 'published';
   createdAt: number;
   updatedAt: number;

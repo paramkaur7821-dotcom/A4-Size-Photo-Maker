@@ -531,6 +531,14 @@ function cleanPost(post, createdAt, updatedAt) {
     metaTitle: String(post.metaTitle || post.title || '').slice(0, 200),
     metaDescription: String(post.metaDescription || '').slice(0, 320),
     featuredImage: String(post.featuredImage || '').slice(0, 500),
+    author: String(post.author || '').slice(0, 80),
+    tags: Array.isArray(post.tags) ? post.tags.map((t) => String(t).trim()).filter(Boolean).slice(0, 20) : [],
+    faq: Array.isArray(post.faq)
+      ? post.faq.slice(0, 30).map((f) => ({
+          q: String(f?.q || '').slice(0, 300),
+          a: String(f?.a || '').slice(0, 2000),
+        }))
+      : [],
     status: post.status === 'published' ? 'published' : 'draft',
     createdAt: createdAt || post.createdAt || Date.now(),
     updatedAt: updatedAt || post.updatedAt || Date.now(),

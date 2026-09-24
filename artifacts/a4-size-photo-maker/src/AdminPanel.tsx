@@ -449,10 +449,13 @@ type PostDraft = {
   title: string;
   excerpt: string;
   category: string;
+  author: string;
   content: string;
   metaTitle: string;
   metaDescription: string;
   featuredImage: string;
+  tags: string;
+  faq: { q: string; a: string }[];
   status: 'draft' | 'published';
 };
 
@@ -461,16 +464,19 @@ const EMPTY_POST: PostDraft = {
   title: '',
   excerpt: '',
   category: 'Guide',
+  author: '',
   content: '',
   metaTitle: '',
   metaDescription: '',
   featuredImage: '',
+  tags: '',
+  faq: [],
   status: 'draft',
 };
 
 function BlogEditor({ editing, post, onSaved, onCancelled }: { editing: boolean; post: PostDraft; onSaved: (p: PostDraft) => Promise<void> | void; onCancelled: () => void }) {
   const [fields, setFields] = useState<PostDraft>(post);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(''); 
   const [message, setMessage] = useState('');
   const [msgTone, setMsgTone] = useState<'ok' | 'err'>('ok');
 
@@ -479,7 +485,7 @@ function BlogEditor({ editing, post, onSaved, onCancelled }: { editing: boolean;
       const next = { ...f, [key]: value } as PostDraft;
       if (key === 'title') {
         const base = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
-        if (!fields.slug || fields.slug === slugify(fields.title)) next.slug = base;
+        if (!f.slug || f.slug === slugify(f.title)) next.slug = base;
       }
       if (key === 'metaTitle' && !value) next.metaTitle = value;
       return next;
@@ -488,59 +494,92 @@ function BlogEditor({ editing, post, onSaved, onCancelled }: { editing: boolean;
 
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const addFaq = () => setFields((f) => ({ ...f, faq: [...f.faq, { q: '', a: '' }] }));
+  const setFaq = (i: number, key: 'q' | 'a', value: string) =>
+    setFields((f) => ({ ...f, faq: f.faq.map((x, xi) => (xi === i ? { ...x, [key]: value } : x)) }));
+  const removeFaq = (i: number) => setFields((f) => ({ ...f, faq: f.faq.filter((_, xi) => xi !== i) }));
+
+  const save = async (status: 'draft' | 'published') => {
     if (!fields.title.trim() || !fields.slug.trim()) {
       setMsgTone('err');
       setMessage('Title and URL slug are required.');
       return;
     }
-    setBusy(true);
+    const patch: PostDraft = { ...fields, status };
+    setBusy(status);
     setMessage('');
     try {
-      await onSaved(fields);
+      await onSaved(patch);
       setMsgTone('ok');
-      setMessage('Saved — the post list updates on the right.');
+      setMessage('Saved.');
     } catch (err: any) {
       setMsgTone('err');
       setMessage(err?.data?.error === 'slug_exists' ? 'That slug already exists — choose another one.' : 'Save failed. Check you are logged in.');
     } finally {
-      setBusy(false);
+      setBusy('');
     }
   };
 
   return (
-    <form className="admin-form" onSubmit={submit}>
-      <div className="admin-form-grid">
+    <form className="admin-form admin-blog-editor" onSubmit={(e) => { e.preventDefault(); save(fields.status); }}>
+      <div className="admin-blog-editor-main">
         <label>Title<input className="admin-input" value={fields.title} onChange={(e) => set('title', e.target.value)} placeholder="Passport size photo for bank forms" /></label>
         <label>URL slug<input className="admin-input" value={fields.slug} onChange={(e) => set('slug', slugify(e.target.value))} placeholder="passport-size-photo-bank-forms" /></label>
-      </div>
-      <div className="admin-form-grid">
-        <label>Category<input className="admin-input" value={fields.category} onChange={(e) => set('category', e.target.value)} placeholder="Guide / Passport guide / News" /></label>
-        <label>Featured image URL<input className="admin-input" value={fields.featuredImage} onChange={(e) => set('featuredImage', e.target.value)} placeholder="https://…/cover.jpg (optional)" /></label>
-      </div>
-      <label>Excerpt / short description<textarea className="admin-input admin-textarea" value={fields.excerpt} onChange={(e) => set('excerpt', e.target.value)} rows={2} placeholder="One-line summary shown on the blog card" /></label>
-      <label>
-        Content <span className="admin-muted">(write HTML — &lt;h2&gt;…&lt;/h2&gt; &lt;p&gt;…&lt;/p&gt;)</span>
-        <textarea className="admin-input admin-textarea" value={fields.content} onChange={(e) => set('content', e.target.value)} rows={12} placeholder={'<h2>Heading</h2>\n<p>Body text…</p>'} />
-      </label>
-      <label>Meta title (SEO)<input className="admin-input" value={fields.metaTitle} onChange={(e) => set('metaTitle', e.target.value)} placeholder="Leave empty to use the title" /></label>
-      <label>Meta description (SEO)<textarea className="admin-input admin-textarea" value={fields.metaDescription} onChange={(e) => set('metaDescription', e.target.value)} rows={2} placeholder="150–160 character search snippet" /></label>
-      <div className="admin-form-grid">
-        <label>Status
-          <select className="admin-input" value={fields.status} onChange={(e) => setFields((f) => ({ ...f, status: e.target.value as 'draft' | 'published' }))}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
+        <label>
+          Content <span className="admin-muted">(write HTML — &lt;h2&gt;…&lt;/h2&gt; &lt;p&gt;…&lt;/p&gt;)</span>
+          <textarea className="admin-input admin-textarea" value={fields.content} onChange={(e) => set('content', e.target.value)} rows={14} placeholder={'<h2>Heading</h2>\n<p>Body text…</p>'} />
         </label>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-          <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={14} /> {busy ? 'Saving…' : editing ? 'Save changes' : 'Create post'}</button>
-          {editing && (
-            <button className="admin-btn" type="button" onClick={onCancelled}><RefreshCcw size={13} /> Cancel</button>
-          )}
+        <label>Excerpt / short description<textarea className="admin-input admin-textarea" value={fields.excerpt} onChange={(e) => set('excerpt', e.target.value)} rows={3} placeholder="One-line summary shown on the blog card" /></label>
+      </div>
+
+      <div className="admin-blog-editor-side">
+        <div className="admin-blog-editor-actions">
+          <button className="admin-btn" type="button" disabled={!!busy} onClick={() => save('draft')}><Save size={14} /> {busy === 'draft' ? 'Saving…' : 'Save draft'}</button>
+          <button className="admin-btn admin-btn-primary" type="button" disabled={!!busy} onClick={() => save('published')}><Check size={14} /> {busy === 'published' ? 'Saving…' : 'Publish'}</button>
+        </div>
+        <label>Category<input className="admin-input" value={fields.category} onChange={(e) => set('category', e.target.value)} placeholder="Guide / Passport guide / News" /></label>
+        <label>Author<input className="admin-input" value={fields.author} onChange={(e) => set('author', e.target.value)} placeholder="Author name" /></label>
+        <label>
+          Cover image
+          <div className="admin-logo-picker">
+            {fields.featuredImage ? <img src={fields.featuredImage} alt="cover preview" className="admin-logo-thumb" style={{ height: 90, width: 120, objectFit: 'cover' }} /> : <ImageIcon size={18} />}
+            <input className="admin-input" value={fields.featuredImage} onChange={(e) => set('featuredImage', e.target.value)} placeholder="https://…/cover.jpg" />
+          </div>
+        </label>
+        <label>Tags<input className="admin-input" value={fields.tags} onChange={(e) => set('tags', e.target.value)} placeholder="passport, photo, guides (comma separated)" /></label>
+
+        <div className="admin-card admin-blog-faq">
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0, fontSize: 15 }}>FAQ</h2>
+            <button className="admin-btn admin-btn-small" type="button" onClick={addFaq}><Plus size={13} /> Add</button>
+          </div>
+          {fields.faq.length === 0 && <p className="admin-muted">Add question & answer pairs (optional).</p>}
+          {fields.faq.map((f, i) => (
+            <div key={i} className="admin-faq-row">
+              <div className="admin-form-grid">
+                <input className="admin-input" value={f.q} onChange={(e) => setFaq(i, 'q', e.target.value)} placeholder="Question" />
+                <button className="admin-btn admin-btn-danger admin-btn-small" type="button" onClick={() => removeFaq(i)}><Trash2 size={13} /></button>
+              </div>
+              <textarea className="admin-input admin-textarea" value={f.a} onChange={(e) => setFaq(i, 'a', e.target.value)} rows={2} placeholder="Answer" />
+            </div>
+          ))}
+        </div>
+
+        <div className="admin-card admin-blog-faq">
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0, fontSize: 15 }}>SEO overview</h2>
+            <Eye size={14} />
+          </div>
+          <label>Meta title<input className="admin-input" value={fields.metaTitle} onChange={(e) => set('metaTitle', e.target.value)} placeholder="Leave empty to use the title" /></label>
+          <label>Meta description<textarea className="admin-input admin-textarea" value={fields.metaDescription} onChange={(e) => set('metaDescription', e.target.value)} rows={3} placeholder="150–160 character search snippet" /></label>
+        </div>
+
+        <div className="admin-blog-editor-actions">
+          {editing && <button className="admin-btn" type="button" onClick={onCancelled}><RefreshCcw size={13} /> Cancel</button>}
         </div>
       </div>
-      {message && <div className={msgTone === 'ok' ? 'admin-success' : 'admin-error'}>{message}</div>}
+
+      {message && <div className={msgTone === 'ok' ? 'admin-success' : 'admin-error'} style={{ gridColumn: '1 / -1' }}>{message}</div>}
     </form>
   );
 }
@@ -574,10 +613,13 @@ function BlogTab() {
       slug: p.slug,
       excerpt: p.excerpt.trim(),
       category: p.category.trim() || 'Guide',
+      author: p.author.trim(),
       content: p.content,
       metaTitle: p.metaTitle.trim() || p.title.trim(),
       metaDescription: p.metaDescription.trim(),
       featuredImage: p.featuredImage.trim(),
+      tags: (p.tags || '').split(',').map((t) => t.trim()).filter(Boolean),
+      faq: p.faq || [],
       status: p.status,
     };
     const existing = apiPosts.find((x) => x.slug === p.slug);
@@ -615,10 +657,13 @@ function BlogTab() {
       title: p.title,
       excerpt: p.excerpt,
       category: p.category,
+      author: p.author || '',
       content: p.content,
       metaTitle: p.metaTitle,
       metaDescription: p.metaDescription,
       featuredImage: p.featuredImage,
+      tags: Array.isArray(p.tags) ? p.tags.join(', ') : '',
+      faq: p.faq || [],
       status: p.status,
     });
     setEditorOpen(true);
@@ -676,6 +721,7 @@ function BlogTab() {
                 <span className="admin-muted">
                   /blog/{p.slug} · {p.category} · {new Date(p.updatedAt).toLocaleDateString()} ·{' '}
                   <span className={p.status === 'published' ? 'admin-badge ok' : 'admin-badge'}>{p.status}</span>
+                  {p.author ? ` · by ${p.author}` : ''}
                 </span>
               </div>
               <div className="admin-city-card-actions" style={{ flexWrap: 'nowrap' }}>
@@ -904,30 +950,15 @@ function SettingsTab() {
 
   const resetAccent = () => setAccent('#7c5cff');
 
-  const persist = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const applyPatch = async (patch: Partial<RemoteSettings>, done: string) => {
     setBusy(true);
     setSaved('');
     try {
-      const patch: Partial<RemoteSettings> = {
-        siteName: siteName || 'FitMyPhotoA4',
-        brandLine,
-        tagline,
-        contactEmail,
-        phone,
-        logo,
-        accent,
-        showCities,
-        seoDefaults: { titleTemplate, metaDescription: homeMetaDesc, keywords },
-        homeSEO: { metaTitle: homeMetaTitle, metaDescription: homeMetaDesc },
-        integrations: { gaId, searchConsole, adsenseScript },
-        social,
-      };
       if (token) {
         const remote = await saveRemoteSettings(patch, token);
         setRemoteState({ settings: remote });
         setMsgTone('ok');
-        setSaved('Settings saved to the API server.');
+        setSaved(done);
       } else {
         saveLocalSettings({ ...loadSettings(), ...patch });
         setMsgTone('ok');
@@ -939,6 +970,34 @@ function SettingsTab() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const saveContact = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyPatch({ contactEmail, phone }, 'Contact info saved to the API server.');
+  };
+
+  const saveSocial = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyPatch({ social }, 'Social links saved to the API server.');
+  };
+
+  const saveIntegrations = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyPatch({ integrations: { gaId, searchConsole, adsenseScript } }, 'Analytics & Search Console saved.');
+  };
+
+  const saveSiteSeo = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyPatch(
+      {
+        siteName: siteName || 'FitMyPhotoA4',
+        tagline,
+        seoDefaults: { titleTemplate, metaDescription: homeMetaDesc, keywords },
+        homeSEO: { metaTitle: homeMetaTitle, metaDescription: homeMetaDesc },
+      },
+      'Site SEO saved to the API server.',
+    );
   };
 
   const onLogoUpload = (file?: File) => {
@@ -1042,27 +1101,17 @@ function SettingsTab() {
       {saved && <div className={msgTone === 'ok' ? 'admin-success' : 'admin-error'}>{saved}</div>}
 
       <div className="admin-settings-grid" style={{ alignItems: 'start' }}>
-        <form className="admin-card admin-form" onSubmit={persist}>
-          <h2>Site information</h2>
-          <label>
-            Site name
-            <input className="admin-input" value={siteName} onChange={(e) => setSiteName(e.target.value)} />
-          </label>
-          <div className="admin-form-grid">
-            <label>
-              Contact email <Mail size={12} style={{ verticalAlign: 'middle' }} />
-              <input className="admin-input" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
-            </label>
-            <label>
-              Phone number <Phone size={12} style={{ verticalAlign: 'middle' }} />
-              <input className="admin-input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 …" />
-            </label>
+        <div className="admin-card">
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0 }}>Site information</h2>
+            <Palette size={15} />
           </div>
+          <label>Site name<input className="admin-input" value={siteName} onChange={(e) => setSiteName(e.target.value)} /></label>
           <label>Brand line<input className="admin-input" value={brandLine} onChange={(e) => setBrandLine(e.target.value)} /></label>
           <label>Tagline<textarea className="admin-input admin-textarea" value={tagline} onChange={(e) => setTagline(e.target.value)} rows={2} /></label>
           <div className="admin-form-grid">
             <label>
-              Accent colour <Palette size={12} style={{ verticalAlign: 'middle' }} />
+              Accent colour
               <input className="admin-input" value={accent} onChange={resetAccent} placeholder="#7c5cff" readOnly style={{ background: accent, color: '#fff', fontWeight: 800 }} />
             </label>
             <label>
@@ -1081,49 +1130,79 @@ function SettingsTab() {
             <input type="checkbox" checked={showCities} onChange={(e) => setShowCities(e.target.checked)} />
             Show the "Haryana · local pages" city cards in the footer
           </label>
-          <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save site info</button>
-        </form>
+          <button className="admin-btn admin-btn-primary" onClick={() => applyPatch({ siteName: siteName || 'FitMyPhotoA4', brandLine, tagline, logo, accent, showCities }, 'Site information saved.')} disabled={busy}><Save size={15} /> Save changes</button>
+        </div>
 
+        <div className="admin-card">
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0 }}>Contact info</h2>
+            <Mail size={15} />
+          </div>
+          <p className="admin-muted">Shown in the site footer so visitors can reach you.</p>
+          <label>
+            Support email
+            <input className="admin-input" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="support@yourdomain.com" />
+          </label>
+          <label>
+            Phone
+            <input className="admin-input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 …" />
+          </label>
+          <button className="admin-btn admin-btn-primary" onClick={saveContact} disabled={busy}><Save size={15} /> Save changes</button>
+        </div>
+      </div>
+
+      <div className="admin-settings-grid" style={{ alignItems: 'start' }}>
         <form className="admin-card admin-form" onSubmit={updatePassword}>
-          <h2>Change admin password</h2>
-          <p className="admin-muted">The password is hashed with scrypt + a random salt on the server. It is never stored in plain text.</p>
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0 }}>Account & security</h2>
+            <KeyRound size={15} />
+          </div>
+          <p className="admin-muted">The admin password is hashed with scrypt + a random salt on the server.</p>
           <label>Current password<input className="admin-input" type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} /></label>
           <label>New password<input className="admin-input" type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} /></label>
           <label>Confirm new password<input className="admin-input" type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} /></label>
-          <button className="admin-btn" type="submit" disabled={busy}>Update password</button>
+          <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}>Change password</button>
+        </form>
+
+        <form className="admin-card admin-form" onSubmit={saveSocial}>
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0 }}>Social links</h2>
+            <Share2 size={15} />
+          </div>
+          <label>Instagram URL<input className="admin-input" value={social.instagram || ''} onChange={(e) => setSocialField('instagram', e.target.value)} placeholder="https://instagram.com/…" /></label>
+          <label>Twitter / X URL<input className="admin-input" value={social.twitter || ''} onChange={(e) => setSocialField('twitter', e.target.value)} placeholder="https://x.com/…" /></label>
+          <label>YouTube URL<input className="admin-input" value={social.youtube || ''} onChange={(e) => setSocialField('youtube', e.target.value)} placeholder="https://youtube.com/@…" /></label>
+          <label>Facebook URL<input className="admin-input" value={social.facebook || ''} onChange={(e) => setSocialField('facebook', e.target.value)} placeholder="https://facebook.com/…" /></label>
+          <label>WhatsApp URL<input className="admin-input" value={social.whatsapp || ''} onChange={(e) => setSocialField('whatsapp', e.target.value)} placeholder="https://wa.me/91…" /></label>
+          <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save changes</button>
         </form>
       </div>
 
-      <form className="admin-card admin-form" onSubmit={persist}>
-        <h2>Homepage & SEO defaults</h2>
-        <div className="admin-form-grid">
+      <div className="admin-settings-grid" style={{ alignItems: 'start' }}>
+        <form className="admin-card admin-form" onSubmit={saveIntegrations}>
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0 }}>Analytics & Search Console</h2>
+            <BarChart3 size={15} />
+          </div>
+          <label>Google Analytics ID<Globe size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={gaId} onChange={(e) => setGaId(e.target.value)} placeholder="G-XXXXXXX" /></label>
+          <label>Google Search Console<textarea className="admin-input admin-textarea" value={searchConsole} onChange={(e) => setSearchConsole(e.target.value)} rows={2} placeholder="Ownership verification meta tag or HTML snippet" /></label>
+          <label>AdSense / ads script (HTML)<textarea className="admin-input admin-textarea" value={adsenseScript} onChange={(e) => setAdsenseScript(e.target.value)} rows={3} placeholder="<script async src=…></script>" /></label>
+          <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save changes</button>
+        </form>
+
+        <form className="admin-card admin-form" onSubmit={saveSiteSeo}>
+          <div className="admin-card-head">
+            <h2 style={{ margin: 0 }}>Site SEO</h2>
+            <TrendingUp size={15} />
+          </div>
+          <label>Site title<input className="admin-input" value={siteName} onChange={(e) => setSiteName(e.target.value)} /></label>
+          <label>Default meta description<textarea className="admin-input admin-textarea" value={homeMetaDesc} onChange={(e) => setHomeMetaDesc(e.target.value)} rows={3} placeholder="Default search snippet used across the site." /></label>
           <label>Homepage meta title<input className="admin-input" value={homeMetaTitle} onChange={(e) => setHomeMetaTitle(e.target.value)} placeholder="FitMyPhotoA4 — Professional A4 Photo Sheet Maker" /></label>
-          <label>Title template (use {'{page}'} as placeholder)<input className="admin-input" value={titleTemplate} onChange={(e) => setTitleTemplate(e.target.value)} /></label>
-        </div>
-        <label>Homepage meta description<textarea className="admin-input admin-textarea" value={homeMetaDesc} onChange={(e) => setHomeMetaDesc(e.target.value)} rows={2} placeholder="Make exact-size passport and ID photo sheets for A4 printing. Local-only, precise, and free." /></label>
-        <label>Default keywords<input className="admin-input" value={keywords} onChange={(e) => setKeywords(e.target.value)} /></label>
-        <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save SEO defaults</button>
-      </form>
-
-      <form className="admin-card admin-form" onSubmit={persist}>
-        <h2>Integrations</h2>
-        <label>Google Analytics ID <Globe size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={gaId} onChange={(e) => setGaId(e.target.value)} placeholder="G-XXXXXXX" /></label>
-        <label>Google Search Console<textarea className="admin-input admin-textarea" value={searchConsole} onChange={(e) => setSearchConsole(e.target.value)} rows={2} placeholder="Ownership verification meta tag or HTML snippet" /></label>
-        <label>AdSense / ads script (HTML)<textarea className="admin-input admin-textarea" value={adsenseScript} onChange={(e) => setAdsenseScript(e.target.value)} rows={3} placeholder="<script async src=…></script>" /></label>
-        <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save integrations</button>
-      </form>
-
-      <form className="admin-card admin-form" onSubmit={persist}>
-        <h2>Social media links</h2>
-        <div className="admin-form-grid">
-          <label>Facebook <Share2 size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={social.facebook || ''} onChange={(e) => setSocialField('facebook', e.target.value)} placeholder="https://facebook.com/…" /></label>
-          <label>Instagram <Share2 size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={social.instagram || ''} onChange={(e) => setSocialField('instagram', e.target.value)} placeholder="https://instagram.com/…" /></label>
-          <label>YouTube <Share2 size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={social.youtube || ''} onChange={(e) => setSocialField('youtube', e.target.value)} placeholder="https://youtube.com/@…" /></label>
-          <label>Twitter / X <Link2 size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={social.twitter || ''} onChange={(e) => setSocialField('twitter', e.target.value)} placeholder="https://x.com/…" /></label>
-          <label>WhatsApp <Link2 size={12} style={{ verticalAlign: 'middle' }} /><input className="admin-input" value={social.whatsapp || ''} onChange={(e) => setSocialField('whatsapp', e.target.value)} placeholder="https://wa.me/91…" /></label>
-        </div>
-        <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save social links</button>
-      </form>
+          <label>Title template <span className="admin-muted">(use {'{page}'} as placeholder)</span><input className="admin-input" value={titleTemplate} onChange={(e) => setTitleTemplate(e.target.value)} /></label>
+          <label>Default keywords<input className="admin-input" value={keywords} onChange={(e) => setKeywords(e.target.value)} /></label>
+          <button className="admin-btn admin-btn-primary" type="submit" disabled={busy}><Save size={15} /> Save changes</button>
+        </form>
+      </div>
 
       <PagesSection />
 
