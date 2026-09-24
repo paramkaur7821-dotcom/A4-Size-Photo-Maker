@@ -18,6 +18,8 @@ import { ALL_SEO_PAGES, type SEOPage } from './seoContent';
 import { CITY_PAGES, CITY_LINKS, CITY_LABELS, type CityInfo } from './cityContent';
 import AdminPanel from './AdminPanel';
 import { loadSettings, loadLabels, bumpVisit } from './adminConfig';
+import { bumpUsage, type BlogPost as ApiBlogPost } from './lib/adminApi';
+import { useAdminState } from './adminStore';
 import {
   ABOUT_PAGE,
   BLOG_ARTICLE_PAGES,
@@ -234,9 +236,12 @@ function setPropertyMeta(property: string, content: string) {
 }
 
 function SiteHeader({ currentPath }: { currentPath: string }) {
+  const store = useAdminState();
   const homeLink = currentPath === '/' ? '#main-content' : '/';
   const toolLink = currentPath === '/' ? '#tool' : '/#tool';
   const guideLink = '/how-it-works';
+  const siteName = store.settings.siteName || 'FitMyPhotoA4';
+  const logo = store.settings.logo || LOGO_SRC;
   const navClass = (path: string) => {
     const active = currentPath === path || (path === '/blog' && currentPath.startsWith('/blog/'));
     return active ? 'is-active' : undefined;
@@ -246,9 +251,9 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
     <header className="site-header">
       <div className="site-header-inner">
         <a className="brand" href={homeLink} data-testid="link-brand">
-          <img className="brand-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
+          <img className="brand-logo" src={logo} alt="FitMyPhotoA4 logo" />
           <span className="brand-copy">
-            <span className="brand-name">FitMyPhotoA4</span>
+            <span className="brand-name">{siteName}</span>
             <span className="brand-tagline">professional photo sheets</span>
           </span>
         </a>
@@ -268,20 +273,50 @@ function SiteHeader({ currentPath }: { currentPath: string }) {
 function SiteFooter() {
   const adminSettings = loadSettings();
   const adminLabels = loadLabels();
-  const siteName = adminSettings.siteName || 'FitMyPhotoA4';
-  const brandLine = adminSettings.brandLine || 'A quiet tool for the print counter.';
+  const store = useAdminState();
+  const merged = { ...adminSettings, ...store.settings };
+  const activeTools = { ...{ passport: true, pan: true, voter: true, stamp: true, custom: true }, ...(merged.tools || {}) };
+  const siteName = merged.siteName || 'FitMyPhotoA4';
+  const brandLine = merged.brandLine || 'A quiet tool for the print counter.';
   const tagline =
-    adminSettings.tagline ||
+    merged.tagline ||
     'Measured passport, PAN, voter ID and licence photo sheets built for A4 printing — everything stays in your browser, and you print one sheet at your nearest shop.';
   const labels = { ...CITY_LABELS, ...adminLabels };
-  const showCities = adminSettings.showCities !== false;
+  const showCities = merged.showCities !== false;
+  const social = merged.social || {};
+
+  const cityLinks = useMemo(() => {
+    const aliases = store.aliases || {};
+    const anyAlias = Object.keys(aliases).length > 0;
+    return CITY_LINKS.map((c) => {
+      const p = anyAlias && aliases[c.path] ? aliases[c.path] : c.path;
+      const override = store.overrides?.[p] || store.overrides?.[c.path];
+      return { ...c, path: p, disabled: override?.enabled === false };
+    });
+  }, [store.aliases, store.overrides]);
+
+  const socialLinks: { label: string; url: string }[] = [
+    { label: 'Facebook', url: social.facebook || '' },
+    { label: 'Instagram', url: social.instagram || '' },
+    { label: 'YouTube', url: social.youtube || '' },
+    { label: 'Twitter', url: social.twitter || '' },
+    { label: 'WhatsApp', url: social.whatsapp || '' },
+  ].filter((x) => x.url);
+
+  const toolLinks: { num: string; label: string; href: string; on: boolean }[] = [
+    { num: '01', label: 'Passport photo maker', href: '/passport-photo-size-maker', on: activeTools.passport !== false },
+    { num: '02', label: 'PAN card photo maker', href: '/pan-card-photo-maker', on: activeTools.pan !== false },
+    { num: '03', label: 'Voter ID photo maker', href: '/voter-id-photo-maker', on: activeTools.voter !== false },
+    { num: '04', label: 'Stamp-size photos', href: '/#tool', on: activeTools.stamp !== false },
+    { num: '05', label: 'Free A4 sheet maker', href: '/#tool', on: activeTools.custom !== false },
+  ].filter((t) => t.on);
 
   return (
     <footer className="footer" data-hide-cities={showCities ? undefined : true}>
       <div className="footer-main">
         <div className="footer-about">
           <div className="footer-brand">
-            <img className="footer-logo" src={LOGO_SRC} alt="FitMyPhotoA4 logo" />
+            <img className="footer-logo" src={merged.logo || LOGO_SRC} alt="FitMyPhotoA4 logo" />
             <div>
               <strong>{siteName}</strong>
               <span><Printer size={12} style={{ verticalAlign: 'middle', marginRight: 7 }} /> {brandLine}</span>
@@ -290,16 +325,22 @@ function SiteFooter() {
           <p className="footer-tagline">
             {tagline}
           </p>
+          {socialLinks.length > 0 && (
+            <div className="footer-social">
+              {socialLinks.map((x) => (
+                <a key={x.label} href={x.url} target="_blank" rel="noreferrer">{x.label}</a>
+              ))}
+            </div>
+          )}
         </div>
 
         <nav className="footer-col" aria-label="Photo tools">
           <h3>Photo tools</h3>
           <div className="footer-tools">
-            <a href="/passport-photo-size-maker"><span>01</span>Passport photo maker</a>
-            <a href="/pan-card-photo-maker"><span>02</span>PAN card photo maker</a>
-            <a href="/voter-id-photo-maker"><span>03</span>Voter ID photo maker</a>
-            <a href="/#tool"><span>04</span>Free A4 sheet maker</a>
-            <a href="/how-it-works"><span>05</span>How it works</a>
+            {toolLinks.map((t) => (
+              <a key={t.num} href={t.href}><span>{t.num}</span>{t.label}</a>
+            ))}
+            <a href="/how-it-works"><span>06</span>How it works</a>
           </div>
         </nav>
 
@@ -307,7 +348,7 @@ function SiteFooter() {
         <nav className="footer-col footer-col-cities" aria-label="Haryana local pages">
           <h3>Haryana · local pages</h3>
           <div className="footer-city-links">
-            {CITY_LINKS.map((city) => (
+            {cityLinks.filter((c) => !c.disabled).map((city) => (
               <a key={city.path} href={city.path}>
                 <span className="footer-city-name">{labels[city.path] ?? city.name}</span>
               </a>
@@ -406,6 +447,18 @@ function TutorialVisualGuide() {
 }
 
 function BlogCards() {
+  const store = useAdminState();
+  const customPosts = (store.posts || []).filter((p) => p.status === 'published');
+  const cards: { path: string; category: string; readTime: string; title: string; description: string }[] = [
+    ...customPosts.map((p) => ({
+      path: `/blog/${p.slug}`,
+      category: p.category || 'Guide',
+      readTime: 'Custom post',
+      title: p.title,
+      description: p.excerpt || p.metaDescription || '',
+    })),
+    ...BLOG_POSTS,
+  ];
   return (
     <section className="blog-card-section" aria-labelledby="blog-card-title">
       <div className="section-kicker">Read the guides</div>
@@ -414,7 +467,7 @@ function BlogCards() {
         <p>Start with the document you are preparing. Each article explains the common size, what to verify with the official source, and how to turn the confirmed measurement into a clean A4 sheet.</p>
       </div>
       <div className="blog-card-grid">
-        {BLOG_POSTS.map((post, index) => (
+        {cards.map((post, index) => (
           <a className="blog-card" href={post.path} key={post.path}>
             <div className="blog-card-top"><span>{String(index + 1).padStart(2, '0')}</span><span>{post.readTime}</span></div>
             <div>
@@ -427,6 +480,65 @@ function BlogCards() {
         ))}
       </div>
     </section>
+  );
+}
+
+function BlogPostView({ post }: { post: ApiBlogPost }) {
+  useEffect(() => {
+    document.title = post.metaTitle || `${post.title} | FitMyPhotoA4`;
+    setMeta('description', post.metaDescription || post.excerpt || '');
+    setPropertyMeta('og:title', post.metaTitle || post.title);
+    setPropertyMeta('og:description', post.metaDescription || post.excerpt || '');
+    setMeta('twitter:title', post.metaTitle || post.title);
+    setMeta('twitter:description', post.metaDescription || post.excerpt || '');
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', new URL(`/blog/${post.slug}`, window.location.origin).toString());
+  }, [post]);
+
+  return (
+    <div className="app-shell">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
+      <SiteHeader currentPath={`/blog/${post.slug}`} />
+      <main id="main-content" className="main-wrap seo-page">
+        <section className="seo-hero" aria-labelledby="seo-page-title">
+          <div className="seo-hero-copy">
+            <div className="eyebrow">{post.category || 'Guide'} · Custom post</div>
+            <h1 id="seo-page-title">{post.title}</h1>
+            {post.featuredImage && <img className="blog-featured" src={post.featuredImage} alt={post.title} loading="lazy" decoding="async" />}
+            {post.excerpt && <p className="hero-intro">{post.excerpt}</p>}
+            <div className="seo-hero-actions">
+              <a className="button button-primary" href="/#tool">Open the photo maker</a>
+              <a className="button button-line" href="/blog">More guides</a>
+            </div>
+          </div>
+          <div className="seo-hero-card">
+            <span className="section-kicker">FitMyPhotoA4</span>
+            <strong>Measured in millimetres.</strong>
+            <p>Published {new Date(post.publishedAt).toLocaleDateString()} · {new Date(post.updatedAt).toLocaleDateString()}</p>
+            <span className="seo-hero-card-mark">Advice · not official</span>
+          </div>
+        </section>
+        <article className="seo-article blog-article" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <section className="seo-related" aria-label="Related blog pages">
+          <div>
+            <div className="section-kicker">Keep reading</div>
+            <h2>More photo size guides.</h2>
+          </div>
+          <div className="seo-related-links">
+            <a href="/passport-photo-size-maker">Passport photo size maker <span>→</span></a>
+            <a href="/pan-card-photo-maker">PAN Card photo maker <span>→</span></a>
+            <a href="/voter-id-photo-maker">Voter ID photo maker <span>→</span></a>
+            <a href="/blog">All guides <span>→</span></a>
+          </div>
+        </section>
+      </main>
+      <div className="main-wrap"><SiteFooter /></div>
+    </div>
   );
 }
 
@@ -562,31 +674,38 @@ function ContactForm() {
 }
 
 function ContentPage({ page }: { page: SEOPage }) {
+  const store = useAdminState();
+  const aliases = store.aliases || {};
+  const effectivePath = aliases[page.path] || page.path;
+  const override = (store.overrides || {})[effectivePath];
+
   useEffect(() => {
-    document.title = page.title;
-    setMeta('description', page.description);
-    setPropertyMeta('og:title', page.title);
-    setPropertyMeta('og:description', page.description);
-    setMeta('twitter:title', page.title);
-    setMeta('twitter:description', page.description);
+    document.title = override?.metaTitle || page.title;
+    setMeta('description', override?.metaDescription || page.description);
+    setPropertyMeta('og:title', override?.metaTitle || page.title);
+    setPropertyMeta('og:description', override?.metaDescription || page.description);
+    setMeta('twitter:title', override?.metaTitle || page.title);
+    setMeta('twitter:description', override?.metaDescription || page.description);
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement('link');
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', new URL(page.path, window.location.origin).toString());
-  }, [page]);
+    canonical.setAttribute('href', new URL(effectivePath, window.location.origin).toString());
+  }, [page, override, effectivePath]);
+
+  const showCustom = !!override?.content;
 
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
-      <SiteHeader currentPath={page.path} />
+      <SiteHeader currentPath={effectivePath} />
       <main id="main-content" className="main-wrap seo-page">
         <section className="seo-hero" aria-labelledby="seo-page-title">
           <div className="seo-hero-copy">
             <div className="eyebrow">{page.eyebrow}</div>
-            <h1 id="seo-page-title">{page.title}</h1>
+            <h1 id="seo-page-title">{override?.h1 || page.title}</h1>
             <p className="hero-intro">{page.intro}</p>
             <div className="seo-hero-actions">
               <a className="button button-primary" href="/#tool">Open the photo maker</a>
@@ -605,6 +724,9 @@ function ContentPage({ page }: { page: SEOPage }) {
         {page.path === '/blog' && <BlogCards />}
         {page.path === '/contact-us' && <ContactForm />}
 
+        {showCustom ? (
+          <article className="seo-article seo-custom-content" dangerouslySetInnerHTML={{ __html: override.content as string }} />
+        ) : (
         <article className="seo-article">
           {page.sections.map((section, index) => (
             <section className="seo-section" key={section.heading}>
@@ -616,6 +738,7 @@ function ContentPage({ page }: { page: SEOPage }) {
             </section>
           ))}
         </article>
+        )}
 
         {page.faqItems && (
           <section className="tutorial-faq" id="tutorial-faq" aria-labelledby="tutorial-faq-title">
@@ -662,20 +785,25 @@ function ContentPage({ page }: { page: SEOPage }) {
 }
 
 function CityPage({ city }: { city: CityInfo }) {
+  const store = useAdminState();
+  const aliases = store.aliases || {};
+  const effectivePath = aliases[city.path] || city.path;
+  const override = (store.overrides || {})[effectivePath];
+
   useEffect(() => {
-    document.title = city.metaTitle;
-    setMeta('description', city.metaDescription);
-    setPropertyMeta('og:title', city.metaTitle);
-    setPropertyMeta('og:description', city.metaDescription);
-    setMeta('twitter:title', city.metaTitle);
-    setMeta('twitter:description', city.metaDescription);
+    document.title = override?.metaTitle || city.metaTitle;
+    setMeta('description', override?.metaDescription || city.metaDescription);
+    setPropertyMeta('og:title', override?.metaTitle || city.metaTitle);
+    setPropertyMeta('og:description', override?.metaDescription || city.metaDescription);
+    setMeta('twitter:title', override?.metaTitle || city.metaTitle);
+    setMeta('twitter:description', override?.metaDescription || city.metaDescription);
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement('link');
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', new URL(city.path, window.location.origin).toString());
+    canonical.setAttribute('href', new URL(effectivePath, window.location.origin).toString());
     const jsonLd = [
       {
         '@context': 'https://schema.org',
@@ -691,7 +819,7 @@ function CityPage({ city }: { city: CityInfo }) {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: window.location.origin },
-          { '@type': 'ListItem', position: 2, name: `${city.name}, ${city.district}`, item: new URL(city.path, window.location.origin).toString() },
+          { '@type': 'ListItem', position: 2, name: `${city.name}, ${city.district}`, item: new URL(effectivePath, window.location.origin).toString() },
         ],
       },
     ];
@@ -703,12 +831,14 @@ function CityPage({ city }: { city: CityInfo }) {
       document.head.appendChild(script);
     }
     script.textContent = JSON.stringify(jsonLd);
-  }, [city]);
+  }, [city, override, effectivePath]);
+
+  const showCustom = !!override?.content;
 
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
-      <SiteHeader currentPath={city.path} />
+      <SiteHeader currentPath={effectivePath} />
       <main id="main-content" className="main-wrap city-page" data-variant={city.variant} style={{ '--city-accent': city.accent } as CSSProperties}>
         <nav className="city-breadcrumb" aria-label="Breadcrumb">
           <a href="/">Home</a><span aria-hidden="true">›</span>
@@ -719,7 +849,7 @@ function CityPage({ city }: { city: CityInfo }) {
         <section className="city-hero" aria-labelledby="city-page-title">
           <div className="city-hero-copy">
             <div className="eyebrow">Local photo sheets · {city.name} ({city.district})</div>
-            <h1 id="city-page-title">{city.heroTitle}</h1>
+            <h1 id="city-page-title">{override?.h1 || city.heroTitle}</h1>
             <p className="hero-intro">{city.intro}</p>
             <div className="seo-hero-actions">
               <a className="button button-primary" href="/#tool">Open the photo maker</a>
@@ -749,6 +879,9 @@ function CityPage({ city }: { city: CityInfo }) {
         </nav>
 
         <div className="city-body">
+          {showCustom ? (
+            <article className="seo-article city-article seo-custom-content" dangerouslySetInnerHTML={{ __html: override.content as string }} />
+          ) : (
           <article className="seo-article city-article">
             {city.sections.map((section, index) => (
               <section className="seo-section" key={section.heading}>
@@ -760,6 +893,7 @@ function CityPage({ city }: { city: CityInfo }) {
               </section>
             ))}
           </article>
+          )}
 
           <aside className="city-aside" aria-label={`Local context for ${city.name}`}>
             <div className="city-place-card">
@@ -838,6 +972,29 @@ function Home() {
   const [dragging, setDragging] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  const store = useAdminState();
+  const tools = { ...{ passport: true, pan: true, voter: true, stamp: true, custom: true }, ...(store.settings.tools || {}) };
+  const PRESET_TOOL: Record<string, string> = {
+    stamp: 'stamp',
+    passport: 'passport',
+    pan: 'pan',
+    voter: 'voter',
+    'us-visa': 'custom',
+    canada: 'custom',
+    china: 'custom',
+    uae: 'custom',
+  };
+  const visiblePresets = useMemo(
+    () => PRESETS.filter((p) => tools[PRESET_TOOL[p.key] || p.key] !== false),
+    [store.settings.tools],
+  );
+  useEffect(() => {
+    if (presetKey !== 'custom' && !visiblePresets.some((p) => p.key === presetKey)) {
+      setPresetKey(visiblePresets[0]?.key || 'passport');
+    }
+  }, [visiblePresets, presetKey]);
+
+  const siteName = store.settings.siteName || 'FitMyPhotoA4';
   const selectedPreset = useMemo(
     () => PRESETS.find((preset) => preset.key === presetKey),
     [presetKey],
@@ -849,8 +1006,11 @@ function Home() {
   const fitCount = columns * rows;
 
   useEffect(() => {
-    document.title = 'FitMyPhotoA4 — Professional A4 Photo Sheet Maker';
-    const description = 'Make exact-size passport and ID photo sheets for A4 printing. Local-only, precise, and free.';
+    const homeSEO = store.settings.homeSEO;
+    document.title = homeSEO?.metaTitle || `${siteName} — Professional A4 Photo Sheet Maker`;
+    const description =
+      homeSEO?.metaDescription ||
+      'Make exact-size passport and ID photo sheets for A4 printing. Local-only, precise, and free.';
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
       meta = document.createElement('meta');
@@ -879,7 +1039,14 @@ function Home() {
       document.head.appendChild(canonical);
     }
     canonical.setAttribute('href', new URL('/', window.location.origin).toString());
-  }, []);
+  }, [siteName, store.settings.homeSEO]);
+
+  useEffect(() => {
+    const accent = store.settings.accent || '';
+    if (accent && accent.includes(' ') && accent.includes('%')) {
+      document.documentElement.style.setProperty('--accent', accent);
+    }
+  }, [store.settings.accent]);
 
   useEffect(() => {
     if (!previewCanvasRef.current) return;
@@ -960,6 +1127,7 @@ function Home() {
       setFileError('This photo size is too large to fit on an A4 sheet.');
       return;
     }
+    bumpUsage(`${photoWidth}x${photoHeight}mm`);
     if (type === 'png') {
       exportCanvas.toBlob((blob) => {
         if (blob) downloadBlob(blob, `a4-photo-sheet-${photoWidth}x${photoHeight}mm.png`);
@@ -988,6 +1156,7 @@ function Home() {
       setFileError('This photo size is too large to fit on an A4 sheet.');
       return;
     }
+    bumpUsage(`${photoWidth}x${photoHeight}mm`);
     const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.95);
     const printWin = window.open('', '_blank');
     if (!printWin) {
@@ -1080,8 +1249,8 @@ function Home() {
             <div className="control-group">
               <div className="control-heading"><label htmlFor="photo-type">Photo type</label><span className="control-value" data-testid="text-photo-size">{photoWidth} × {photoHeight} mm</span></div>
               <select id="photo-type" className="select-input" value={presetKey} onChange={(event) => setPresetKey(event.target.value)} data-testid="select-photo-type">
-                {PRESETS.map((preset) => <option key={preset.key} value={preset.key}>{preset.label} — {preset.detail}</option>)}
-                <option value="custom">Custom size — enter your own mm</option>
+                {visiblePresets.map((preset) => <option key={preset.key} value={preset.key}>{preset.label} — {preset.detail}</option>)}
+                {tools.custom !== false && <option value="custom">Custom size — enter your own mm</option>}
               </select>
               {presetKey === 'custom' && (
                 <div className="custom-fields">
@@ -1259,6 +1428,7 @@ function App() {
     const path = window.location.pathname.replace(/\/+$/, '');
     return path || '/';
   });
+  const store = useAdminState();
 
   useEffect(() => {
     bumpVisit(currentPath);
@@ -1268,12 +1438,25 @@ function App() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [currentPath]);
+
+  const aliases = store.aliases || {};
+  const resolvedPath = (() => {
+    const aliasKey = Object.keys(aliases).find((k) => aliases[k] === currentPath);
+    return aliasKey || currentPath;
+  })();
 
   if (currentPath === '/admin') return <AdminPanel />;
-  const page = APP_PAGES[currentPath];
+
+  const blogMatch = currentPath.match(/^\/blog\/([a-z0-9-]+)$/);
+  if (blogMatch) {
+    const post = (store.posts || []).find((p) => p.slug === blogMatch[1] && p.status === 'published');
+    if (post) return <BlogPostView post={post} />;
+  }
+
+  const page = APP_PAGES[resolvedPath];
   if (page) return <ContentPage page={page} />;
-  const city = CITY_PAGES[currentPath];
+  const city = CITY_PAGES[resolvedPath];
   return city ? <CityPage city={city} /> : <Home />;
 }
 

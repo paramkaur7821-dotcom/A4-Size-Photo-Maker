@@ -51,6 +51,10 @@ const DEFAULT_SETTINGS = {
   siteName: 'FitMyPhotoA4',
   tagline: 'Free A4 photo sheet maker',
   contactEmail: 'paramkaur7821@gmail.com',
+  phone: '',
+  logo: '',
+  social: {},
+  homeSEO: null,
   accent: '#7c5cff',
   otpEnabled: true,
   seoDefaults: {
@@ -109,6 +113,7 @@ function db() {
       settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
       pageOverrides: {},
       pageAliases: {},
+      posts: {},
     };
     return d;
   }
@@ -509,6 +514,27 @@ function publicSettings(d) {
     tools: s.tools,
     integrations: s.integrations,
     seoDefaults: s.seoDefaults,
+    phone: s.phone || '',
+    logo: s.logo || '',
+    social: s.social || {},
+    homeSEO: s.homeSEO || null,
+  };
+}
+
+function cleanPost(post, createdAt, updatedAt) {
+  return {
+    slug: String(post.slug || '').slice(0, 80),
+    title: String(post.title || '').slice(0, 200),
+    excerpt: String(post.excerpt || '').slice(0, 400),
+    category: String(post.category || 'Guide').slice(0, 80),
+    content: String(post.content || '').slice(0, 100000),
+    metaTitle: String(post.metaTitle || post.title || '').slice(0, 200),
+    metaDescription: String(post.metaDescription || '').slice(0, 320),
+    featuredImage: String(post.featuredImage || '').slice(0, 500),
+    status: post.status === 'published' ? 'published' : 'draft',
+    createdAt: createdAt || post.createdAt || Date.now(),
+    updatedAt: updatedAt || post.updatedAt || Date.now(),
+    publishedAt: post.publishedAt || (post.status === 'published' ? Date.now() : 0),
   };
 }
 
@@ -530,7 +556,7 @@ const server = http.createServer(async (req, res) => {
   const u = new URL(req.url || '/', 'http://localhost');
   const p = u.pathname;
 
-  const ROUTES = ['/api/health', '/api/auth', '/api/stats', '/api/settings', '/api/pages', '/api/activity'];
+  const ROUTES = ['/api/health', '/api/auth', '/api/stats', '/api/settings', '/api/pages', '/api/activity', '/api/posts'];
   if (req.method !== 'OPTIONS' && !ROUTES.some((r) => p.startsWith(r))) {
     return json({ error: 'not found' }, 404, res);
   }
@@ -731,8 +757,12 @@ const server = http.createServer(async (req, res) => {
     if (typeof patch.siteName === 'string') s.siteName = patch.siteName.slice(0, 80);
     if (typeof patch.tagline === 'string') s.tagline = patch.tagline.slice(0, 160);
     if (typeof patch.contactEmail === 'string') s.contactEmail = patch.contactEmail.slice(0, 120);
+    if (typeof patch.phone === 'string') s.phone = patch.phone.slice(0, 40);
+    if (typeof patch.logo === 'string') s.logo = patch.logo.slice(0, 1200);
     if (typeof patch.accent === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(patch.accent)) s.accent = patch.accent;
     if (typeof patch.otpEnabled === 'boolean') s.otpEnabled = patch.otpEnabled;
+    if (patch.homeSEO && typeof patch.homeSEO === 'object') s.homeSEO = Object.assign({}, s.homeSEO, patch.homeSEO);
+    if (patch.social && typeof patch.social === 'object') s.social = Object.assign({}, s.social, patch.social);
     if (patch.seoDefaults && typeof patch.seoDefaults === 'object') {
       s.seoDefaults = Object.assign({}, s.seoDefaults, patch.seoDefaults);
     }
@@ -842,6 +872,84 @@ const server = http.createServer(async (req, res) => {
     return json({ ok: true }, 200, res);
   }
 
+  if (p === '/api/posts' && req.method === 'GET') {
+    const d = store.load();
+    const admin = !!authFrom(req, conn);
+    const posts = d.posts || {};
+    const list = Object.values(posts).map((x) => x);
+    if (!admin) {
+      const out = list.filter((x) => x.status === 'published');
+      out.sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0));
+      return json({ posts: out }, 200, res);
+    }
+    list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    return json({ posts: list }, 200, res);
+  }
+
+  if (p === '/api/posts' && req.method === 'POST') {
+    if (!authFrom(req, conn)) return json({ error: 'unauthorized' }, 401, res);
+    const d = store.load();
+    const body = await readBody(req);
+    if (body._parseError) return json({ error: 'bad json' }, 400, res);
+    const slug = String(body.slug || '').replace(/^\/+|\/+$/g, '').toLowerCase();
+    if (!/^[a-z0-9-]+$/.test(slug)) return json({ error: 'bad_slug' }, 400, res);
+    if (d.posts[slug]) return json({ error: 'slug_exists' }, 409, res);
+    const now = Date.now();
+    d.posts[slug] = cleanPost({
+      slug,
+      title: String(body.title || '').slice(0, 200),
+      excerpt: String(body.excerpt || '').slice(0, 400),
+      category: String(body.category || 'Guide').slice(0, 80),
+      content: String(body.content || '').slice(0, 100000),
+      metaTitle: String(body.metaTitle || body.title || '').slice(0, 200),
+      metaDescription: String(body.metaDescription || '').slice(0, 320),
+      featuredImage: String(body.featuredImage || '').slice(0, 500),
+      status: body.status === 'published' ? 'published' : 'draft',
+    }, now, now);
+    store.save();
+    log(conn, 'post_created', 'admin', 'blog: ' + slug + ' (' + d.posts[slug].status + ')');
+    return json({ ok: true, posts: Object.values(d.posts) }, 200, res);
+  }
+
+  const postSlugMatch = p.match(/^\/api\/posts\/([^/]+)\/?$/);
+  if (postSlugMatch && req.method === 'PUT') {
+    if (!authFrom(req, conn)) return json({ error: 'unauthorized' }, 401, res);
+    const d = store.load();
+    const body = await readBody(req);
+    if (body._parseError) return json({ error: 'bad json' }, 400, res);
+    const oldSlug = decodeURIComponent(postSlugMatch[1]);
+    const existing = d.posts[oldSlug];
+    if (!existing) return json({ error: 'not_found' }, 404, res);
+    let newSlug = oldSlug;
+    if (typeof body.slug === 'string') {
+      newSlug = body.slug.replace(/^\/+|\/+$/g, '').toLowerCase();
+      if (!/^[a-z0-9-]+$/.test(newSlug)) return json({ error: 'bad_slug' }, 400, res);
+      if (newSlug !== oldSlug && d.posts[newSlug]) return json({ error: 'slug_exists' }, 409, res);
+    }
+    const merged = Object.assign({}, existing, body);
+    merged.slug = newSlug;
+    merged.updatedAt = Date.now();
+    if (body.status === 'published' && existing.status !== 'published') {
+      merged.publishedAt = merged.publishedAt || Date.now();
+    }
+    delete d.posts[oldSlug];
+    d.posts[newSlug] = cleanPost(merged, existing.createdAt || Date.now(), merged.updatedAt);
+    store.save();
+    log(conn, 'post_updated', 'admin', 'blog: ' + newSlug + ' (' + d.posts[newSlug].status + ')');
+    return json({ ok: true, posts: Object.values(d.posts) }, 200, res);
+  }
+
+  if (postSlugMatch && req.method === 'DELETE') {
+    if (!authFrom(req, conn)) return json({ error: 'unauthorized' }, 401, res);
+    const d = store.load();
+    const slug = decodeURIComponent(postSlugMatch[1]);
+    if (!d.posts[slug]) return json({ error: 'not_found' }, 404, res);
+    delete d.posts[slug];
+    store.save();
+    log(conn, 'post_deleted', 'admin', 'blog: ' + slug);
+    return json({ ok: true }, 200, res);
+  }
+
   if (p === '/api/data/export' && req.method === 'GET') {
     if (!authFrom(req, conn)) return json({ error: 'unauthorized' }, 401, res);
     const d = store.load();
@@ -852,6 +960,7 @@ const server = http.createServer(async (req, res) => {
       settings: d.settings,
       pageOverrides: d.pageOverrides,
       pageAliases: d.pageAliases,
+      posts: d.posts,
       exportedAt: new Date().toISOString(),
     };
     return json(copy, 200, res);
@@ -868,6 +977,7 @@ const server = http.createServer(async (req, res) => {
     if (src.pageAliases && typeof src.pageAliases === 'object') d.pageAliases = src.pageAliases;
     if (src.stats && typeof src.stats === 'object') d.stats = Object.assign({}, d.stats, src.stats);
     if (Array.isArray(src.activity)) d.activity = src.activity;
+    if (src.posts && typeof src.posts === 'object') d.posts = src.posts;
     store.save();
     log(conn, 'data_imported', 'admin', 'restored backup');
     return json({ ok: true }, 200, res);
