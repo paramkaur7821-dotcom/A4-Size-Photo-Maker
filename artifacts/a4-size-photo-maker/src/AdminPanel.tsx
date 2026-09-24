@@ -1184,7 +1184,7 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
   ];
 
   return (
-    <div className="admin">
+    <div className="admin admin-shell">
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <span className="admin-logo-mark">A4</span>

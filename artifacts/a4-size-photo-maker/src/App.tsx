@@ -973,7 +973,8 @@ function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const store = useAdminState();
-  const tools = { ...{ passport: true, pan: true, voter: true, stamp: true, custom: true }, ...(store.settings.tools || {}) };
+  const tools: Record<string, boolean> = { passport: true, pan: true, voter: true, stamp: true, custom: true };
+  for (const [k, v] of Object.entries(store.settings.tools || {})) tools[k] = v;
   const PRESET_TOOL: Record<string, string> = {
     stamp: 'stamp',
     passport: 'passport',
