@@ -13,9 +13,10 @@
  *  - Site settings (SEO defaults, GA/Search Console, AdSense, tool toggles)
  *  - Per-page SEO overrides (title, meta title, meta description, H1, content, slug aliases)
  *
- * Storage: JSON file database on disk. NOTE: on Render's free plan the
- * instance disk is ephemeral, so data resets when the instance is recycled.
- * Use the Export/Import backup in Settings, or add a Render Persistent Disk (paid).
+ * Storage: Supabase PostgreSQL via PostgREST (global fetch, zero deps).
+ * Falls back to a local JSON file when SUPABASE_URL is not configured.
+ * NOTE: on Render's free plan the local file is ephemeral — configure
+ * SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY for durable storage.
  */
 
 const http = require('http');
@@ -45,6 +46,8 @@ const ENV = {
   SESSION_TTL_MS: Number(process.env.SESSION_TTL_MS || 24 * 60 * 60 * 1000),
   RESEND_COOLDOWN_MS: Number(process.env.RESEND_COOLDOWN_MS || 60000),
   IS_PROD: String(process.env.NODE_ENV || '').slice(0, 0) === 'production' || String(process.env.NODE_ENV || '') === 'production',
+  SUPABASE_URL: (process.env.SUPABASE_URL || '').replace(/\/+$/, ''),
+  SUPABASE_KEY: process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || '',
 };
 
 const DEFAULT_SETTINGS = {
@@ -76,28 +79,107 @@ const DEFAULT_SETTINGS = {
   },
 };
 
+function dbBackend() {
+  const sb = ENV.SUPABASE_URL && ENV.SUPABASE_KEY;
+  return {
+    isSupabase: !!sb,
+    url: sb ? ENV.SUPABASE_URL + '/rest/v1/' : '',
+    key: ENV.SUPABASE_KEY,
+  };
+}
+
+function sbHeaders(key, json) {
+  const h = {
+    apikey: key,
+    Authorization: 'Bearer ' + key,
+  };
+  if (json) h['Content-Type'] = 'application/json';
+  return h;
+}
+
+async function sbGet(b) {
+  const res = await fetch(b.url + 'app_kv?id=eq.1&select=value', {
+    headers: sbHeaders(b.key),
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error('supabase GET ' + res.status);
+  const rows = await res.json();
+  return rows && rows.length ? rows[0].value : null;
+}
+
+async function sbUpsert(b, value) {
+  const res = await fetch(b.url + 'app_kv', {
+    method: 'POST',
+    headers: sbHeaders(b.key, true),
+    body: JSON.stringify({ id: 1, value, updated_at: new Date().toISOString() }),
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error('supabase UPSERT ' + res.status + ' ' + body.slice(0, 160));
+  }
+  return true;
+}
+
 function db() {
   let data = null;
-  function load() {
-    if (data) return data;
-    try {
-      if (fs.existsSync(DB_FILE)) data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-    } catch (e) {
-      console.error('DB read failed', e.message);
+
+  async function init() {
+    const b = dbBackend();
+    if (b.isSupabase) {
+      try {
+        data = await sbGet(b);
+      } catch (e) {
+        console.error('[db] supabase load failed, falling back to file:', e.message);
+      }
+    }
+    if (!data) {
+      try {
+        if (fs.existsSync(DB_FILE)) data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      } catch (e) {
+        console.error('DB read failed', e.message);
+      }
     }
     if (!data) {
       data = seed();
     }
-    return data;
-  }
-  function save() {
-    try {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-      fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-    } catch (e) {
-      console.error('DB write failed', e.message);
+    if (b.isSupabase) {
+      try {
+        await saveToSupabase();
+      } catch (e) {
+        console.error('[db] initial supabase sync failed:', e.message);
+      }
     }
   }
+
+  let saveQueue = Promise.resolve();
+
+  async function saveToSupabase() {
+    const b = dbBackend();
+    await sbUpsert(b, data);
+  }
+
+  function save() {
+    const b = dbBackend();
+    // keep last data written to disk for the file fallback path
+    if (b.isSupabase) {
+      saveQueue = saveQueue.then(() => saveToSupabase()).catch((e) => {
+        console.error('[db] supabase save failed:', e.message);
+      });
+    } else {
+      try {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+      } catch (e) {
+        console.error('DB write failed', e.message);
+      }
+    }
+  }
+
+  function load() {
+    return data;
+  }
+
   function seed() {
     const hash = makeHash(ENV.ADMIN_PASSWORD);
     const d = {
@@ -117,7 +199,7 @@ function db() {
     };
     return d;
   }
-  return { load, save };
+  return { init, load, save, seed };
 }
 
 const store = db();
@@ -571,7 +653,8 @@ const server = http.createServer(async (req, res) => {
 
   if (p === '/api/health') {
     const d = store.load();
-    return json({ ok: true, db: DB_FILE, activity: d.activity.length }, 200, res);
+    const backend = dbBackend();
+    return json({ ok: true, db: backend.isSupabase ? 'supabase/postgres' : DB_FILE, activity: d.activity.length }, 200, res);
   }
 
   if (p === '/api/auth/login') {
@@ -994,8 +1077,15 @@ const server = http.createServer(async (req, res) => {
   return json({ error: 'not found' }, 404, res);
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log('[a4-api] listening on :' + PORT);
-  console.log('[a4-api] smtp configured: ' + (!!ENV.SMTP_HOST && !!ENV.SMTP_USER));
-  console.log('[a4-api] otp email: ' + (ENV.ADMIN_EMAIL || '(none — set ADMIN_EMAIL)'));
+store.init().then(() => {
+  server.listen(PORT, '0.0.0.0', () => {
+    const backend = dbBackend();
+    console.log('[a4-api] listening on :' + PORT);
+    console.log('[a4-api] storage: ' + (backend.isSupabase ? 'supabase/postgres' : 'file: ' + DB_FILE));
+    console.log('[a4-api] smtp configured: ' + (!!ENV.SMTP_HOST && !!ENV.SMTP_USER));
+    console.log('[a4-api] otp email: ' + (ENV.ADMIN_EMAIL || '(none — set ADMIN_EMAIL)'));
+  });
+}).catch((err) => {
+  console.error('[a4-api] init failed:', err);
+  process.exit(1);
 });
